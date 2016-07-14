@@ -32,19 +32,19 @@ namespace ScrapeService
 
             string fee = "";
             string size = "";
-            string updated = "";
+            DateTime updated = new DateTime();
             string rooms = "";
 
             foreach (var v in node.ChildNodes)             // skriver ut rätt värde ur tabellen, oformatterat.
             {
                 if(v.Equals(node.ChildNodes.ElementAt(0)))
-                    fee = GetFee(v.LastChild.InnerText);        // via metoden som plockar bort alla chars som inte är siffror
+                    fee = v.LastChild.InnerText.GetNumber();        // via metoden som plockar bort alla chars som inte är siffror
                 if (v.Equals(node.ChildNodes.ElementAt(1)))
                     rooms = v.LastChild.InnerText;
                 if (v.Equals(node.ChildNodes.ElementAt(2)))
-                    size = v.LastChild.InnerText;
+                    size = v.LastChild.InnerText.GetNumber();
                 if (v.Equals(node.ChildNodes.ElementAt(3)))     
-                    updated = v.LastChild.InnerText;            // Här behöver vi göra om strängen till en datetime
+                    updated = v.LastChild.InnerText.GetDateTime();    // via extentionmethod som konverterar till datetime
             }
             Console.WriteLine("Fee: " + fee);
             Console.WriteLine("Rooms: " + rooms);
@@ -56,15 +56,6 @@ namespace ScrapeService
         Console.ReadKey();
         }
 
-        static public string GetFee(string str)
-        {
-            string result = "";
-            for (int i = 0; i < str.Length; i++)
-            {
-                if (Char.IsDigit(str, i))
-                    result += str.ElementAt(i);
-            }
-            return result;
-        }
+        
     }
 }
