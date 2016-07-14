@@ -43,14 +43,15 @@ namespace ScrapeService
                     rooms = v.LastChild.InnerText;
                 if (v.Equals(node.ChildNodes.ElementAt(2)))
                     size = v.LastChild.InnerText;
-                if (v.Equals(node.ChildNodes.ElementAt(3)))
-                    updated = v.LastChild.InnerText;
+                if (v.Equals(node.ChildNodes.ElementAt(3)))     
+                    updated = v.LastChild.InnerText;            // Här behöver vi göra om strängen till en datetime
             }
             Console.WriteLine("Fee: " + fee);
             Console.WriteLine("Rooms: " + rooms);
             Console.WriteLine("Size: " + size);
             Console.WriteLine("Updated: " + updated);
 
+            // Nya upp ett objekt HousingObject och fyll med data -> skriv till JSON -> tanka upp
 
         Console.ReadKey();
         }
