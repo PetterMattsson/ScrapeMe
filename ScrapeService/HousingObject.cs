@@ -24,5 +24,7 @@ namespace ScrapeService
         public string SourceUrl { get; set; }
         public string SourceName { get; set; }
 
+
+
     }
 }
