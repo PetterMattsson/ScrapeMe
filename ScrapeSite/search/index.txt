@@ -1,0 +1,110 @@
+﻿{
+	"name": "housing",
+	"corsOptions": {
+		"allowedOrigins": ["*"]
+	},
+	"fields": [
+
+		{
+			"name": "housingId",
+			"type": "Edm.String",
+			"key": true,
+			"searchable": false,
+			"sortable": false,
+			"facetable": false
+		},
+
+		{
+			"name": "title",
+			"type": "Edm.String"
+		},
+
+		{
+			"name": "description",
+			"type": "Edm.String",
+			"filterable": false,
+			"sortable": false,
+			"facetable": false
+		},
+
+		{
+			"name": "category",
+			"type": "Edm.String"
+		},
+
+		{
+			"name": "numberOfRooms",
+			"type": "Edm.Int32"
+		},
+
+		{
+			"name": "fee",
+			"type": "Edm.String",
+			"facetable": false
+		},
+
+		{
+			"name": "size",
+			"type": "Edm.String",
+			"facetable": false
+		},
+
+		{
+			"name": "area",
+			"type": "Edm.String",
+			"sortable": false
+		},
+
+		{
+			"name": "city",
+			"type": "Edm.String",
+			"sortable": false
+		},
+
+		{
+			"name": "municipality",
+			"type": "Edm.String",
+			"sortable": false
+		},
+
+		{
+			"name": "county",
+			"type": "Edm.String",
+			"sortable": false
+		},
+
+		{
+			"name": "updated",
+			"type": "Edm.DateTimeOffset"
+		},
+
+		{
+			"name": "address",
+			"type": "Edm.String",
+			"sortable": false,
+			"filterable": false
+		},
+
+		{
+			"name": "sourceName",
+			"type": "Edm.String",
+			"searchable": false,
+			"filterable": false,
+			"sortable": false,
+			"facetable": false
+		},
+
+		{
+			"name": "sourceUrl",
+			"type": "Edm.String",
+			"searchable": false,
+			"filterable": false,
+			"sortable": false,
+			"facetable": false
+		}
+
+
+	]
+
+
+}

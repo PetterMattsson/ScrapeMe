@@ -1,9 +1,24 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScrapeService", "ScrapeService\ScrapeService.csproj", "{C78C8DB4-6139-41A1-BC2B-E0CE90AD2B5D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScrapeSite", "ScrapeSite\ScrapeSite.csproj", "{5ACE9A26-E198-4AAF-8583-5F702F89B656}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PublishScripts", "PublishScripts", "{D3D43E0E-6F39-4DB0-A176-B22E413688EE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{37F11E40-BECA-49D6-AF83-E3E0183E1D64}"
+	ProjectSection(SolutionItems) = preProject
+		PublishScripts\Scripts\Deploy-AzureResourceGroup.ps1 = PublishScripts\Scripts\Deploy-AzureResourceGroup.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{335C1CBA-7892-463D-93AC-9ABE44662B1F}"
+	ProjectSection(SolutionItems) = preProject
+		PublishScripts\Templates\ScrapeSite.json = PublishScripts\Templates\ScrapeSite.json
+		PublishScripts\Templates\ScrapeSite.param.dev.json = PublishScripts\Templates\ScrapeSite.param.dev.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +30,16 @@ Global
 		{C78C8DB4-6139-41A1-BC2B-E0CE90AD2B5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C78C8DB4-6139-41A1-BC2B-E0CE90AD2B5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C78C8DB4-6139-41A1-BC2B-E0CE90AD2B5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5ACE9A26-E198-4AAF-8583-5F702F89B656}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5ACE9A26-E198-4AAF-8583-5F702F89B656}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5ACE9A26-E198-4AAF-8583-5F702F89B656}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5ACE9A26-E198-4AAF-8583-5F702F89B656}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{37F11E40-BECA-49D6-AF83-E3E0183E1D64} = {D3D43E0E-6F39-4DB0-A176-B22E413688EE}
+		{335C1CBA-7892-463D-93AC-9ABE44662B1F} = {D3D43E0E-6F39-4DB0-A176-B22E413688EE}
 	EndGlobalSection
 EndGlobal
