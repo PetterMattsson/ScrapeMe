@@ -1,0 +1,40 @@
+﻿{
+    "value": [
+        {
+            "@search.action": "upload",
+            "housingId": "1",
+            "title": "En lägenhet",
+            "description": "Bästa lägenheten",
+            "category": "Uthyres",
+            "numberOfRooms": 5,
+            "fee": "3000 kr/mån",
+            "size": "1000 kvm",
+            "area": "Madesjö",
+            "city": "Nybro",
+			"municipality": "Nybro",
+			"county": "Småland",
+            "updated": "2010-06-27T00:00:00Z",
+            "address": "Skolvägen 4",
+            "sourceName": "Blocket",
+			"sourceUrl": "http://www.blocket.se"
+        },
+        {
+            "@search.action": "upload",
+            "housingId": "2",
+            "title": "Ett lägernhet är jätte. Fint.",
+            "description": "Näst bästa lägenheten",
+            "category": "Bytes",
+            "numberOfRooms": 3,
+            "fee": "200 kr",
+            "size": "30 kvm",
+            "area": "Möllan",
+            "city": "Malmö",
+			"municipality": "Malmö",
+			"county": "Skåne",
+            "updated": "1982-04-28T00:00:00Z",
+            "address": "Vägen 1",
+            "sourceName": "MKB",
+			"sourceUrl": "http://www.mkb.se"
+        }
+    ]
+}
