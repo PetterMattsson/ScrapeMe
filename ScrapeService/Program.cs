@@ -13,26 +13,64 @@ namespace ScrapeService
     {
         static void Main(string[] args)
         {
-            // http://localhost:65165/Index.html
-
-            // test med att söka i document istället
-            var webGet = new HtmlWeb();
-            var document = webGet.Load("http://localhost:65165/Index.html");
-
-            HtmlNode findBody = document.DocumentNode.Descendants("article").First() ;
-            HtmlNode titleNode = findBody.FirstChild.InnerHtml.ToHtmlNode();
-            string title = titleNode.FirstChild.GetAttributeValue("title");
-
+            // set up Browserobject
             ScrapingBrowser Browser = new ScrapingBrowser();
             Browser.AllowAutoRedirect = true;
             Browser.AllowMetaRedirect = true;
 
+            // get page
             WebPage PageResult = Browser.NavigateToPage(new Uri("http://localhost:65165/Index.html"));
-            //List<HtmlNode> nodes = new List<HtmlNode>();
 
-            // ger oss tabellen
+            // get body
+            HtmlNode body = PageResult.Html.Descendants("article").First();
+
+            /*
+             * BREAK OUT THE DATA WITH YOUR COCK OUT
+             */
+
+            // get title
+            HtmlNode titleNode = body.FirstChild.InnerHtml.ToHtmlNode();
+            string title = titleNode.FirstChild.GetAttributeValue("title");
+            Console.WriteLine("Title: " + title);
+
+            // get category
+            string category = titleNode.FirstChild.NextSibling.OuterHtml.GetFirstWord();
+            Console.WriteLine("Category: " + category);
+
+            // get County
+            HtmlNode countyNode = PageResult.Html.CssSelect(".e").FirstOrDefault().FirstChild;
+            string county = countyNode.FirstChild.InnerText.RemoveLastWord();
+            Console.WriteLine("County: " + county);
+
+            // get Municipality
+            string municipality = countyNode.FirstChild.NextSibling.InnerText.KeepMiddleWord();
+            Console.WriteLine("Municipality: " + municipality);
+
+            // get area
+            HtmlNode areaNode = body.FirstChild.NextSibling;
+            string area = areaNode.FirstChild.NextSibling.InnerText.GetLastWord();
+            Console.WriteLine("Area: " + area);
+
+            // get adress
+            string address = areaNode.FirstChild.NextSibling.InnerText.GetFirstWord();
+            Console.WriteLine("Adress: " + address);
+
+            // get description
+            HtmlNode descriptionNode = body.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling;
+            string description = descriptionNode.InnerText;
+            Console.WriteLine("Description: " + description);
+
+            // get sourceUrl
+            HtmlNode sourceUrlNode = descriptionNode.NextSibling.NextSibling;
+            string sourceUrl = sourceUrlNode.GetAttributeValue("href");
+            Console.WriteLine("SourceUrl: " + sourceUrl);
+
+            // get sourceName
+            string sourceName = sourceUrlNode.InnerText;
+            Console.WriteLine("SourceName: " + sourceName);
+
+            // get fee, size, updated & rooms
             HtmlNode TableNode = PageResult.Html.CssSelect(".av").FirstOrDefault().FirstChild;
-            //var node2 = node.ChildNodes.ElementAt(2);
 
             string fee = "";
             string size = "";
@@ -59,7 +97,5 @@ namespace ScrapeService
 
         Console.ReadKey();
         }
-
-        
     }
 }

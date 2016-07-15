@@ -42,5 +42,29 @@ namespace ScrapeService
                 return DateTime.Now.AddDays(-days);
             }
         }
+
+        public static string GetFirstWord(this string str)
+        {
+            string[] splitString = Regex.Split(str, @"(\s|,)");
+            return splitString.ElementAt(0);
+        }
+
+        public static string GetLastWord(this string str)
+        {
+            string[] splitString = Regex.Split(str, @"(\s|,)");
+            int i = splitString.Count();
+            return splitString.ElementAt(i - 1);
+        }
+
+        public static string RemoveLastWord(this string str)
+        {
+            return str.Substring(0, str.LastIndexOf(" ")).Trim();
+        }
+
+        public static string KeepMiddleWord(this string str)
+        {
+            string[] splitString = Regex.Split(str, @"(\s)");
+            return splitString.ElementAt(2);
+        }
     }
 }
