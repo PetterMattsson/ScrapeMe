@@ -30,7 +30,26 @@
                     <h1>Welcome to Scrape Search</h1>
                     <p>Search: <input type="text" ng-model="query"></p>
                     <p><input type="button" value="SEARCH" ng-click="goSearch()"></p>
-                    <p ng-bind="searchResult">Test</p>
+                    <p>Search terms for demo</p>
+                    <ul>
+                        <li>Malmö</li>
+                        <li>Möllan</li>
+                        <li>Nybro</li>
+                        <li>Läg*</li>
+                    </ul>
+                    <ul>
+                        <li ng-repeat="x in records">
+                            <div id="frame">
+                            <h3>{{x.title}}</h3>
+                                <p>{{x.description}}</p>
+                                <table>
+                                    <tr><td>Avgift: </td><td>{{x.fee}}</td></tr>
+                                    <tr><td>Storlek:</td><td>{{x.size}}</td></tr>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                    
                 </div>
             </div>
         </div>
@@ -54,7 +73,7 @@
 
                     $http(req)
                        .then(function (response) {
-                           $scope.searchResult = response.data.value.area;
+                           $scope.records = response.data.value;
                        });
                 };
             });
