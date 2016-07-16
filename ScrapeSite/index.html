@@ -21,6 +21,8 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     
+    <link href="css/custom.css" rel="stylesheet" />
+    
 </head>
 <body>
     <div class="container">
@@ -28,16 +30,17 @@
             <div ng-app="searchApp">
                 <div ng-controller="searchCtrl">
                     <h1>Welcome to Scrape Search</h1>
-                    <p>Search: <input type="text" ng-model="query"></p>
-                    <p><input type="button" value="SEARCH" ng-click="goSearch()"></p>
-                    <p>Search terms for demo</p>
-                    <ul>
-                        <li>Malmö</li>
-                        <li>Möllan</li>
-                        <li>Nybro</li>
-                        <li>Läg*</li>
-                    </ul>
-                    <table class="table table-striped">
+                    <div id="custom-search-input">
+                        <div class="input-group col-md-12">
+                            <input type="text" ng-model="query" class=" search-query form-control" placeholder="Search" />
+                            <span class="input-group-btn">
+                                <button class="btn btn-danger" type="button" ng-click="goSearch()">
+                                    <span class=" glyphicon glyphicon-search" ></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <table class="table table-condensed">
                         <thead>
                             <tr>
                                 <th>Titel</th>
@@ -54,6 +57,14 @@
                         </tr>
                     </table>
                     
+                    <p>Search terms for demo</p>
+                    <ul>
+                        <li>Malmö</li>
+                        <li>Möllan</li>
+                        <li>Nybro</li>
+                        <li>Läg*</li>
+                    </ul>
+    
                 </div>
             </div>
         </div>
