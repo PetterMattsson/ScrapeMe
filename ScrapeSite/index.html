@@ -37,18 +37,22 @@
                         <li>Nybro</li>
                         <li>Läg*</li>
                     </ul>
-                    <ul>
-                        <li ng-repeat="x in records">
-                            <div id="frame">
-                            <h3>{{x.title}}</h3>
-                                <p>{{x.description}}</p>
-                                <table>
-                                    <tr><td>Avgift: </td><td>{{x.fee}}</td></tr>
-                                    <tr><td>Storlek:</td><td>{{x.size}}</td></tr>
-                                </table>
-                            </div>
-                        </li>
-                    </ul>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Titel</th>
+                                <th>Beskrivning</th>
+                                <th>Avgift</th>
+                                <th>Yta</th>
+                            </tr>
+                        </thead>
+                        <tr ng-repeat="x in records">
+                            <td>{{x.title}}</td>
+                            <td>{{x.description}}</td>
+                            <td>{{x.fee}}</td>
+                            <td>{{x.size}}</td>
+                        </tr>
+                    </table>
                     
                 </div>
             </div>
