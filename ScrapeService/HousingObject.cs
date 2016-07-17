@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 
 namespace ScrapeService
 {
@@ -23,7 +25,13 @@ namespace ScrapeService
         public string Address { get; set; }
         public string SourceUrl { get; set; }
         public string SourceName { get; set; }
-
+        //Convert housing object to JSON 
+        public string ToJson()
+        {
+            string sb = JsonConvert.SerializeObject(this);
+            return sb;
+        }
+        
 
 
     }
