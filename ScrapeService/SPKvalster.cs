@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using ScrapySharp.Extensions;
+using System.Web.UI.WebControls;
 
 namespace ScrapeService
 {
@@ -76,6 +77,12 @@ namespace ScrapeService
 
             // return object to ScrapeClass
             return ho;
+        }
+
+        public Xml GetSiteMap()
+        {
+            Xml sitemap = new Xml();
+            return sitemap;
         }
 
     }
