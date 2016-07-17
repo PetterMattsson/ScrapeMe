@@ -6,7 +6,7 @@
 	"fields": [
 
 		{
-			"name": "housingId",
+			"name": "HousingId",
 			"type": "Edm.String",
 			"key": true,
 			"searchable": false,
@@ -15,12 +15,12 @@
 		},
 
 		{
-			"name": "title",
+			"name": "Title",
 			"type": "Edm.String"
 		},
 
 		{
-			"name": "description",
+			"name": "Description",
 			"type": "Edm.String",
 			"filterable": false,
 			"sortable": false,
@@ -28,65 +28,65 @@
 		},
 
 		{
-			"name": "category",
+			"name": "Category",
 			"type": "Edm.String"
 		},
 
 		{
-			"name": "numberOfRooms",
+			"name": "Rooms",
 			"type": "Edm.Int32"
 		},
 
 		{
-			"name": "fee",
-			"type": "Edm.String",
+			"name": "Fee",
+			"type": "Edm.Int32",
 			"facetable": false
 		},
 
 		{
-			"name": "size",
-			"type": "Edm.String",
+			"name": "Size",
+			"type": "Edm.Double",
 			"facetable": false
 		},
 
 		{
-			"name": "area",
+			"name": "Area",
 			"type": "Edm.String",
 			"sortable": false
 		},
 
 		{
-			"name": "city",
+			"name": "City",
 			"type": "Edm.String",
 			"sortable": false
 		},
 
 		{
-			"name": "municipality",
+			"name": "Municipality",
 			"type": "Edm.String",
 			"sortable": false
 		},
 
 		{
-			"name": "county",
+			"name": "County",
 			"type": "Edm.String",
 			"sortable": false
 		},
 
 		{
-			"name": "updated",
+			"name": "Updated",
 			"type": "Edm.DateTimeOffset"
 		},
 
 		{
-			"name": "address",
+			"name": "Address",
 			"type": "Edm.String",
 			"sortable": false,
 			"filterable": false
 		},
 
 		{
-			"name": "sourceName",
+			"name": "SourceName",
 			"type": "Edm.String",
 			"searchable": false,
 			"filterable": false,
@@ -95,7 +95,7 @@
 		},
 
 		{
-			"name": "sourceUrl",
+			"name": "SourceUrl",
 			"type": "Edm.String",
 			"searchable": false,
 			"filterable": false,
