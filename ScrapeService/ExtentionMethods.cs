@@ -66,5 +66,14 @@ namespace ScrapeService
             string[] splitString = Regex.Split(str, @"(\s)");
             return splitString.ElementAt(2);
         }
+
+        public static string GetAddress(this string str)
+        {
+            int i = str.LastIndexOf(",");
+            if (i > 1)
+                return str.Substring(0, i);
+            else
+                return str;
+        }
     }
 }
