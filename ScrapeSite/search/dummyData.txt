@@ -35,6 +35,24 @@
             "address": "Vägen 1",
             "sourceName": "MKB",
 			"sourceUrl": "http://www.mkb.se"
+        },
+		{
+            "@search.action": "upload",
+            "housingId": "3",
+            "title": "Elsas lya",
+            "description": "En lägenhet för kattälskare.",
+            "category": "Uthyres",
+            "numberOfRooms": 3,
+            "fee": "3500 kr",
+            "size": "90 kvm",
+            "area": "Kvarnby",
+            "city": "Malmö",
+			"municipality": "Malmö",
+			"county": "Skåne",
+            "updated": "1982-04-28T00:00:00Z",
+            "address": "Bullerbygatan 50",
+            "sourceName": "MKB",
+			"sourceUrl": "http://www.mkb.se"
         }
     ]
 }

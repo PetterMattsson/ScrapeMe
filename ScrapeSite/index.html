@@ -9,6 +9,10 @@
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Angular-->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -16,44 +20,80 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
-
+    
+    <link href="css/custom.css" rel="stylesheet" />
+    
 </head>
 <body>
-    <div ng-app="searchApp">
-        <div ng-controller="searchCtrl">
-            <p>Search: <input type="text" ng-model="query"></p>
-            <p><input type="button" value="SEARCH" ng-click="goSearch()"></p>
+    <div class="container">
+        <div class="starter-template">
+            <div ng-app="searchApp">
+                <div ng-controller="searchCtrl">
+                    <h1>Welcome to Scrape Search</h1>
+                    <div id="custom-search-input">
+                        <div class="input-group col-md-12">
+                            <input type="text" ng-model="query" class=" search-query form-control" placeholder="Search" />
+                            <span class="input-group-btn">
+                                <button class="btn btn-danger" type="button" ng-click="goSearch()">
+                                    <span class=" glyphicon glyphicon-search" ></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Titel</th>
+                                <th>Beskrivning</th>
+                                <th>Avgift</th>
+                                <th>Yta</th>
+                            </tr>
+                        </thead>
+                        <tr ng-repeat="x in records">
+                            <td>{{x.title}}</td>
+                            <td>{{x.description}}</td>
+                            <td>{{x.fee}}</td>
+                            <td>{{x.size}}</td>
+                        </tr>
+                    </table>
+                    
+                    <p>Search terms for demo</p>
+                    <ul>
+                        <li>Malmö</li>
+                        <li>Möllan</li>
+                        <li>Nybro</li>
+                        <li>Läg*</li>
+                    </ul>
+    
+                </div>
+            </div>
         </div>
-        <div ng-controller="resultCtrl">
-            {{searchResult}}
-        </div>
-
     </div>
+        <!-- Custom scipts -->
+        <script>
 
-    <!-- Angular -->
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
-    <!-- Custom scipts -->
-    <script>
+            var app = angular.module('searchApp', []);
 
-	var app = angular.module('searchApp', []);
+            app.controller('searchCtrl', function ($scope, $http) {
+                $scope.goSearch = function () {
+                    var myUrl = "https://scrapeme.search.windows.net/indexes/housing/docs?search="+$scope.query+"&api-version=2015-02-28";
+                    var req = {
+                        method: 'GET',
+                        url: myUrl,
+                        headers: {
+                            'Content-Type': 'application/JSON',
+                            'api-key': '702D2B776E3D459E128ACCCAECD01BD9'
+                        }
+                    };
 
-	app.controller('searchCtrl', function($scope){
-		$scope.goSearch = function (){
-		alert ($scope.query);
-		};
-	});
+                    $http(req)
+                       .then(function (response) {
+                           $scope.records = response.data.value;
+                       });
+                };
+            });
 
-	app.controller('resultCtrl', function($scope, $http){
-			$http.get('https://scrapeme.search.windows.net/indexes/housing/docs?search=Nybro&api-version=2015-02-28')
-			.then(function(response){
-				$scope.searchResult = response.data;
-
-		});
-	});
-    </script>
+           
+        </script>
 </body>
 </html>
