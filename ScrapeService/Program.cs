@@ -14,7 +14,7 @@ namespace ScrapeService
     {
         static void Main(string[] args)
         {
-            ScrapeClass ScrapeService = new ScrapeClass("http://kvalster.se//sitemap.xml");
+            ScrapeClass ScrapeService = new ScrapeClass("http://kvalster.se/");
             ScrapeService.Scrape(new SPKvalster());
             // skriv ut NumberOfScrapes och aktuellt ObjectId
         Console.ReadKey();
