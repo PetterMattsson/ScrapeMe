@@ -32,7 +32,7 @@
                     <h1>Welcome to Scrape Search</h1>
                     <div id="custom-search-input">
                         <div class="input-group col-md-12">
-                            <input type="text" ng-model="query" class=" search-query form-control" placeholder="Search" />
+                            <input type="text" ng-model="query" class=" search-query form-control" placeholder="Search" ng-keydown="$event.which === 13 && goSearch()" />
                             <span class="input-group-btn">
                                 <button class="btn btn-danger" type="button" ng-click="goSearch()">
                                     <span class=" glyphicon glyphicon-search" ></span>
@@ -76,7 +76,7 @@
 
             app.controller('searchCtrl', function ($scope, $http) {
                 $scope.goSearch = function () {
-                    var myUrl = "https://scrapeme.search.windows.net/indexes/housing/docs?search="+$scope.query+"&api-version=2015-02-28";
+                    var myUrl = "https://scrapeme.search.windows.net/indexes/housing/docs?search="+$scope.query+"*&api-version=2015-02-28";
                     var req = {
                         method: 'GET',
                         url: myUrl,
