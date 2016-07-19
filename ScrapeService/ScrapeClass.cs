@@ -35,8 +35,7 @@ namespace ScrapeService
         {
             pattern.GetSiteMap(url);
             HousingObject ho = pattern.Scrape("http://kvalster.se/Halmstad/Uthyres/L%C3%A4genheter/Snostorpsvagen_66_1775554");
-            ho.HousingId = ObjectId.ToString();
-            ho.HousingId = "5".ToString();
+            ho.HousingId = 5;
             ObjectsToSave.Add(ho);
             //foreach (string url in urls)
             //{
