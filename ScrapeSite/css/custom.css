@@ -36,3 +36,37 @@
     .search-query:focus + button {
         z-index: 3;   
     }
+
+/*Hosuing list object styling*/
+.housing-frame{
+    border:solid 1px black;
+    position:relative;
+}
+
+.housing-title{
+
+}
+
+.housing-description{
+
+}
+
+.housing-rooms{
+
+}
+
+.housing-fee{
+
+}
+
+.housing-size{
+
+}
+
+.housing-location{
+
+}
+
+.housing-category{
+
+}
