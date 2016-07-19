@@ -79,7 +79,7 @@ namespace ScrapeService
                 }
             };
 
-            serviceClient.Indexes.Create();
+            serviceClient.Indexes.Create(definition);
         }
     }
 }

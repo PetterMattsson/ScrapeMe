@@ -34,7 +34,7 @@ namespace ScrapeService
         public void Scrape(SPKvalster pattern)
         {
             HousingObject ho = pattern.Scrape("http://kvalster.se/Halmstad/Uthyres/L%C3%A4genheter/Snostorpsvagen_66_1775554");
-            ho.HousingId = 5;
+            ho.HousingId = "5".ToString();
             ObjectsToSave.Add(ho);
             //foreach (string url in urls)
             //{
@@ -116,6 +116,8 @@ namespace ScrapeService
             // save ho to db
             // skicka iväg lista av HousingObjects
             SeachService sp = new SeachService();
+            sp.DeleteIndex();
+            sp.BuildIndex();
             sp.ListUpload(hos);
         }
     }
