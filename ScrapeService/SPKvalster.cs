@@ -127,13 +127,14 @@ namespace ScrapeService
             //    xml = xml.Remove(0, _byteOrderMarkUtf8.Length);
             //}
             byte[] encodedString = Encoding.UTF8.GetBytes(s);
+            string joined = string.Join(",", encodedString.Select(x => x.ToString()).ToArray());
             using (MemoryStream ms = new MemoryStream(encodedString))
             {
                 ms.Flush();
                 ms.Position = 0;
                 xml.Load(ms);
             }
-
+            
             //    int index = s.IndexOf((char)0x1F);
             //if (index > 0)
             //    xml.LoadXml(s.Substring(index, s.Length - index));
