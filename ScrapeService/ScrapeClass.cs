@@ -115,7 +115,8 @@ namespace ScrapeService
             //ObjectsToSave = new List<HousingObject>();
             // save ho to db
             // skicka iväg lista av HousingObjects
-            SeachPush sp = new SeachPush(hos);
+            SeachService sp = new SeachService();
+            sp.ListUpload(hos);
         }
     }
 }
