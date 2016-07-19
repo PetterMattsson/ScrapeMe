@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using ScrapySharp.Extensions;
 using System.Web.UI.WebControls;
+using System.Xml;
+using System.Text.RegularExpressions;
+using System.IO;
+using System.Web;
+using System.Net;
 
 namespace ScrapeService
 {
@@ -79,10 +84,69 @@ namespace ScrapeService
             return ho;
         }
 
-        public Xml GetSiteMap()
+        public List<string> GetSiteMap(string url)
         {
-            Xml sitemap = new Xml();
-            return sitemap;
+            List<string> result = new List<string>();
+
+            WebClient Client = new WebClient();
+            string path = Path.Combine(Environment.CurrentDirectory, @"Data\", "Data.txt");
+            //Client.DownloadFile(url + "sitemap.xml", path);
+
+            ScrapingBrowser Browser = new ScrapingBrowser();
+            Browser.AllowAutoRedirect = true;
+            Browser.AllowMetaRedirect = true;
+            //Browser.TransferEncoding = "UTF-8";
+            //string s = Browser.DownloadString(new Uri (url + "Search/sitemap"));
+            string s = "";
+            WebRequest request = WebRequest.Create(url + "sitemap");
+            request.Timeout = 30 * 60 * 1000;
+            request.UseDefaultCredentials = true;
+            request.Proxy.Credentials = request.Credentials;
+            WebResponse response = request.GetResponse();
+            using (Stream stream = response.GetResponseStream())
+            {
+                using (StreamReader reader = new StreamReader (stream, true))
+                {
+                    Encoding c = reader.CurrentEncoding;
+                    s = reader.ReadToEnd();
+                }
+                response.Close();
+            }
+
+
+            s = s.Replace(Convert.ToString((byte)0x1F), "");
+
+            //string s2 = File.ReadAllText(s);
+            s = Regex.Replace(s, @"[\u0000-\u001F]", string.Empty);
+
+            XmlDocument xml = new XmlDocument();
+            //xml.GetElementsByTagName("loc");
+            //string _byteOrderMarkUtf8 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
+            //if (xml.StartsWith(_byteOrderMarkUtf8))
+            //{
+            //    xml = xml.Remove(0, _byteOrderMarkUtf8.Length);
+            //}
+            byte[] encodedString = Encoding.UTF8.GetBytes(s);
+            using (MemoryStream ms = new MemoryStream(encodedString))
+            {
+                ms.Flush();
+                ms.Position = 0;
+                xml.Load(ms);
+            }
+
+            //    int index = s.IndexOf((char)0x1F);
+            //if (index > 0)
+            //    xml.LoadXml(s.Substring(index, s.Length - index));
+            //else
+            //    xml.LoadXml(s);
+            //xml.Load(url + "Search/sitemap");
+            XmlNamespaceManager manager = new XmlNamespaceManager(xml.NameTable);
+            manager.AddNamespace("s", xml.DocumentElement.NamespaceURI); //Using xml's properties instead of hard-coded URI
+            XmlNodeList xnList = xml.SelectNodes("/s:sitemapindex/s:sitemap", manager);
+            // get page
+            WebPage PageResult = Browser.NavigateToPage(new Uri(url + "Search/sitemap"));
+            
+            return result;
         }
 
     }
