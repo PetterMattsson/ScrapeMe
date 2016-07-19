@@ -22,7 +22,7 @@ namespace ScrapeService
         int ObjectId = 1;
         List<HousingObject> ObjectsToSave = new List<HousingObject>();
 
-        public ScrapeClass()
+        public ScrapeClass(string url)
         {
             //urls = Loop(url);
             //XmlTextReader reader = new XmlTextReader(url);
@@ -31,39 +31,30 @@ namespace ScrapeService
         }
 
         // Overload for more ScrapingPatterns
-        public void Scrape(SPKvalster pattern, string url)
+        public void Scrape(SPKvalster pattern)
         {
-            //HousingObject ho = pattern.Scrape("http://kvalster.se/Halmstad/Uthyres/L%C3%A4genheter/Snostorpsvagen_66_1775554");
-            //ObjectId = 5;
-            //ho.HousingId = ObjectId.ToString();
-            //ObjectsToSave.Add(ho);
-            //urls = Loop(url);
-            List<string> sitemaps = new List<string>();
-            sitemaps = pattern.GetSiteMap(url);
-            int thread = 0;
-            // THREAD THIS LOOP
-            foreach (string s in urls)
-            {
-                HousingObject ho = pattern.Scrape(url);           // catch object returned by scrapingpattern
+            HousingObject ho = pattern.Scrape("http://kvalster.se/Halmstad/Uthyres/L%C3%A4genheter/Snostorpsvagen_66_1775554");
+            ho.HousingId = 5;
+            ObjectsToSave.Add(ho);
+            //foreach (string url in urls)
+            //{
+            //    HousingObject ho = pattern.Scrape(url);           // catch object returned by scrapingpattern
 
-                if (ho.SourceUrl == "" || ho.SourceUrl == null)     // only save if the sourceUrl is present
-                {
-                    ObjectsToSave.Remove(ho);
-                }
-                else
-                {
-                    ho.HousingId = ObjectId.ToString();
-                    ObjectId += 1;
-                }
-            }
+            //    if (ho.SourceUrl != "" || ho.SourceUrl != null)     // only save if the sourceUrl is present
+            //    {
+            //        ho.Id = ObjectId;
+            //        SaveData(ho);
+            //    }
+                ObjectId += 1;
+            //}
             SaveData(ObjectsToSave);
         }
 
         public List<string> Loop(string map)
         {
             // xml-taggen som ska hämtas är <doc>värde</doc>
-            //XDocument doc = XDocument.Load(map);
-            //SiteMapPath smp = new SiteMapPath();
+            XDocument doc = XDocument.Load(map);
+            SiteMapPath smp = new SiteMapPath();
             //smp.SiteMapProvider;
 
 
@@ -80,7 +71,7 @@ namespace ScrapeService
             //doc = reader.ReadOuterXml(); ;
 
             //// Download sitemap.
-            XElement sitemap = XElement.Load(map + "/Search/sitemap");
+            XElement sitemap = XElement.Load("http://www.gstatic.com/culturalinstitute/sitemaps/www_google_com_culturalinstitute/sitemap-index.xml");
 
             //// ... XNames.
             XName url = XName.Get("url", "http://www.sitemaps.org/schemas/sitemap/0.9");
@@ -121,7 +112,11 @@ namespace ScrapeService
 
         public void SaveData(List<HousingObject> hos)
         {
-            SeachPush sp = new SeachPush(hos);
+            //ObjectsToSave = new List<HousingObject>();
+            // save ho to db
+            // skicka iväg lista av HousingObjects
+            SeachService sp = new SeachService();
+            sp.ListUpload(hos);
         }
     }
 }

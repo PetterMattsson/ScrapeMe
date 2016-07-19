@@ -7,10 +7,11 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>ScrapeMe Search Demo</title>
 
-    <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <!-- Angular-->
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
 
@@ -27,26 +28,78 @@
 <body>
     <div class="container">
         <div class="starter-template">
+
+            <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#">Scrape site</a>
+                    </div>
+                    <div class="collapse navbar-collapse" id="myNavbar">
+                        <ul class="nav navbar-nav">
+                            <li class="active"><a href="#">Home</a></li>
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">Advertise</a></li>
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Filtrera<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">Filter 1</a></li>
+                                    <li><a href="#">Filter 2</a></li>
+                                    <li><a href="#">Filter 3</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        
+                        <!-- To be implemented later
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                            <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                        </ul>
+                            -->
+                    </div>
+                </div>
+            </nav>
             <div ng-app="searchApp">
                 <div ng-controller="searchCtrl">
-                    <h1>Welcome to Scrape Search</h1>
                     <div id="custom-search-input">
                         <div class="input-group col-md-12">
                             <input type="text" ng-model="query" class=" search-query form-control" placeholder="Search" ng-keydown="$event.which === 13 && goSearch()" />
                             <span class="input-group-btn">
                                 <button class="btn btn-danger" type="button" ng-click="goSearch()">
-                                    <span class=" glyphicon glyphicon-search" ></span>
+                                    <span class="glyphicon glyphicon-search" ></span>
                                 </button>
                             </span>
                         </div>
                     </div>
+                    <ul class="list-group">
+                        <li class="list-group-item" ng-repeat="x in records">
+                            <div class="housing-frame">
+                                <a href="http://www.google.se">
+                                    <h3 class="housing-title">{{x.Title}}</h3>
+                                    <span class="housing-location">{{x.County}}> {{x.Municipality}}> {{x.City}}> {{x.Area}}</span>
+                                    <span class="housing-category"><strong>{{x.Category}}</strong></span>
+                                    <p class="housing-description">{{x.Description}}</p>
+                                    <div class="housing-details">
+                                        <span class="housing-rooms"><span class="glyphicon glyphicon-home"></span> {{x.Rooms}} rum</span>
+                                        <span class="housing-fee"><span class="glyphicon glyphicon-piggy-bank"></span> {{x.Fee}} kr/mån</span>
+                                        <span class="housing-size"><span class="glyphicon glyphicon-fullscreen"></span> {{x.Size}} kvm</span>
+                                    </div>
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                    <!--
                     <table class="table table-condensed">
                         <thead>
                             <tr>
                                 <th>Titel</th>
                                 <th>Beskrivning</th>
-                                <th>Avgift</th>
-                                <th>Yta</th>
+                                <th>Avgift (kr/mån)</th>
+                                <th>Yta (kvm)</th>
                             </tr>
                         </thead>
                         <tr ng-repeat="x in records">
@@ -56,7 +109,7 @@
                             <td>{{x.Size}}</td>
                         </tr>
                     </table>
-                    
+                    -->
                     <p>Search terms for demo</p>
                     <ul>
                         <li>Malmö</li>
