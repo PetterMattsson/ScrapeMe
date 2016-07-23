@@ -35,6 +35,10 @@ namespace ScrapeService
             {
                 return DateTime.Now.Date;
             }
+            else if (str.Contains("Igår"))
+            {
+                return DateTime.Now.AddDays(-1);
+            }
             else
             {
                 string[] splitString = Regex.Split(str, @"(\s)");
@@ -74,6 +78,30 @@ namespace ScrapeService
                 return str.Substring(0, i);
             else
                 return str;
+        }
+
+        // HousingObject METHODS
+        public static HousingObjectID ConvertToInt(this HousingObject ho)
+        {
+            HousingObjectID hoID = new HousingObjectID
+            {
+                HousingId = Convert.ToInt32(ho.HousingId),
+                Address = ho.Address,
+                Area = ho.Area,
+                Category = ho.Category,
+                City = ho.City,
+                County = ho.County,
+                Description = ho.Description,
+                Fee = ho.Fee,
+                Municipality = ho.Municipality,
+                Rooms = ho.Rooms,
+                Size = ho.Size,
+                SourceName = ho.SourceName,
+                SourceUrl = ho.SourceUrl,
+                Title = ho.Title,
+                Updated = ho.Updated
+            };
+            return hoID;
         }
     }
 }
