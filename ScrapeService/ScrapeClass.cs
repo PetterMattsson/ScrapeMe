@@ -68,6 +68,7 @@ namespace ScrapeService
         {
             bool newTable = false;
             List<HousingObjectID> hosID = new List<HousingObjectID>();
+            string table = newTable ? "HousingObjectsAlternate" : "HousingObjects";
 
             // Konvertera till objekttyp som matchar databasen
             foreach (var ho in hos)
@@ -80,9 +81,14 @@ namespace ScrapeService
             using (SqlConnection con = new SqlConnection(conString))
             {
                 con.Open();
+                using (SqlCommand com = new SqlCommand("Delete from " + table, con))
+                {
+                    // rensa data ur tabellen vi ska använda
+                    com.ExecuteNonQuery();
+                }
                 if (!newTable)
                 {
-                    string table = "HousingObjects";
+                    //string table = "HousingObjects";
                     using (SqlCommand com = new SqlCommand("",con))
                     {
                         com.CommandText = "insert into " + table + "(Title, Description, Category, Rooms, Fee, Size, Area, City, Municipality, County, Updated, Address, SourceUrl, SourceName) values (@Title, @Description, @Category, @Rooms, @Fee, @Size, @Area, @City, @Municipality, @County, @Updated, @Address, @SourceUrl, @SourceName)";
@@ -114,7 +120,7 @@ namespace ScrapeService
                 }
                 if(newTable)
                 {
-                    string table = "HousingObjectsAlternate";
+                    //string table = "HousingObjectsAlternate";
                     using (SqlCommand com = new SqlCommand("", con))
                     {
                         com.CommandText = "insert into " + table + "(Title, Description, Category, Rooms, Fee, Size, Area, City, Municipality, County, Updated, Address, SourceUrl, SourceName) values (@Title, @Description, @Category, @Rooms, @Fee, @Size, @Area, @City, @Municipality, @County, @Updated, @Address, @SourceUrl, @SourceName)";
