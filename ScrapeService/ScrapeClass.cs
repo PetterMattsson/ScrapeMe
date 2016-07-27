@@ -21,45 +21,111 @@ namespace ScrapeService
     {
         public DataSet Data { get; set; }
         public List<string> urls = new List<string>();
-        int NumberOfScrapes;
-        int ObjectId = 1;
+        //int NumberOfScrapes;
+        //int ObjectId = 1;
         List<HousingObject> ObjectsToSave = new List<HousingObject>();
+        string table = "";
+        string conString = "Server = tcp:scraperesultserver.database.windows.net,1433; Initial Catalog = ScrapeResults; Persist Security Info = False; User ID = scraperesultlogin; Password =B1g02016; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30;";
 
         public ScrapeClass()
         {
+            table = GetTable();
 
-
-            NumberOfScrapes = urls.Count();
+            
 
         }
+
+        public string GetTable()
+        {
+            string str = "";
+            if (table == "")
+            {
+                table = "HousingObjects";
+            }
+            else
+            {
+                using (SqlConnection con = new SqlConnection(conString))
+                {
+                    con.Open();
+                    using (SqlCommand com = new SqlCommand("Select TableName from TableToUse", con))
+                    {
+                        // hämta vilken tabell vi ska använda
+                        str = com.ExecuteScalar().ToString();
+                    }
+                    con.Close();
+                }
+            }
+            return str;
+        }
+
+        public void SetTable(string str)
+        {
+            string tn = table == "HousingObjects" ? "HousingObjectsAlternate" : "HousingObjects";
+            using (SqlConnection con = new SqlConnection(conString))
+            {
+                con.Open();
+                using (SqlCommand com = new SqlCommand("Update TableToUse Set TableName = " + tn))
+                {
+                    com.ExecuteNonQuery();
+                }
+                con.Close();
+            }
+        }
+
 
         // Overload for more ScrapingPatterns
         public void Scrape(SPKvalster pattern, string url)
         {
-            //pattern.GetSiteMap(url);
-            //urls = Loop(url);
-            HousingObject ho = pattern.Scrape("http://kvalster.se/Halmstad/Uthyres/L%C3%A4genheter/Snostorpsvagen_66_1775554");
-            ho.HousingId = ObjectId.ToString();
-            ObjectsToSave.Add(ho);
-            //foreach (string url in urls)
-            //{
-            //    HousingObject ho = pattern.Scrape(url);           // catch object returned by scrapingpattern
+            List<string> maps = pattern.GetSiteMap(url + @"\sitemap");
+            //XMLMethods.WriteToData(url + @"\sitemap");
+            //List<string> maps = XMLMethods.ReadFromData();
+            urls = Loop(maps);
 
-            //    if (ho.SourceUrl != "" || ho.SourceUrl != null)     // only save if the sourceUrl is present
-            //    {
-            //        ho.Id = ObjectId;
-            //        SaveData(ho);
-            //    }
-            ObjectId += 1;
-            //}
+            foreach (string link in urls)
+            {
+                HousingObject ho = pattern.Scrape(link);           // catch object returned by scrapingpattern
+
+                if (ho.SourceUrl != "" || ho.SourceUrl != null)     // only save if the sourceUrl is present
+                {
+                    ho.HousingId = Variables.GetObjectId().ToString();
+                    Variables.IncrementObjectId();
+                }
+            }
             SaveData(ObjectsToSave);
         }
 
-        public List<string> Loop(string sitemap)
+        public List<string> Loop(List<string> sitemaps)
         {
-            // xml-taggen som ska hämtas är <doc>värde</doc>
-            // tänkt att fylla listan urls med alla URL:s ifrån en sitemap
+            /*
+             *      DET ÄR DEN FÖRSTA LOOPEN HÄR SOM VI BEHÖVER TRÅDA
+             */
 
+
+            // xml-taggen som ska hämtas är <loc>värde</loc>
+            //fyller listan urls med alla URL:s ifrån ett sitemapindex som vi får ifrån ScrapingPattern
+            List<List<string>> sites = new List<List<string>>();
+            int i = 0;
+            foreach (string map in sitemaps)
+            {
+                XMLMethods.WriteToData(map);
+                List<string> tmp = XMLMethods.ReadFromData();
+                List<string> tmp2 = new List<string>();
+                foreach (string site in tmp)
+                {
+                    urls.Add(site);
+                }
+                Console.WriteLine(urls.Count());
+                //sites.Add(tmp2);
+            //}
+            //foreach (List<string> list in sites)
+            //{
+            //    foreach (string str in list)
+            //    {
+            //        urls.Add(str);
+            //    }
+            }
+
+            Variables.AddScrapes(urls.Count());
             return urls;
         }
 
@@ -68,7 +134,7 @@ namespace ScrapeService
         {
             bool newTable = false;
             List<HousingObjectID> hosID = new List<HousingObjectID>();
-            string table = newTable ? "HousingObjectsAlternate" : "HousingObjects";
+            table = newTable ? "HousingObjectsAlternate" : "HousingObjects";
 
             // Konvertera till objekttyp som matchar databasen
             foreach (var ho in hos)
@@ -89,10 +155,10 @@ namespace ScrapeService
                 if (!newTable)
                 {
                     //string table = "HousingObjects";
-                    using (SqlCommand com = new SqlCommand("",con))
+                    using (SqlCommand com = new SqlCommand("", con))
                     {
                         com.CommandText = "insert into " + table + "(Title, Description, Category, Rooms, Fee, Size, Area, City, Municipality, County, Updated, Address, SourceUrl, SourceName) values (@Title, @Description, @Category, @Rooms, @Fee, @Size, @Area, @City, @Municipality, @County, @Updated, @Address, @SourceUrl, @SourceName)";
-                        
+
                         foreach (var ho in hosID)
                         {
                             // hur gör jag för att knö in ett helt objekt i en insert? att stega igenom properties är drygt
@@ -115,10 +181,11 @@ namespace ScrapeService
 
                             // Gör anropet till databasen
                             com.ExecuteNonQuery();
+                            Variables.IncrementSaves();
                         }
                     }
                 }
-                if(newTable)
+                if (newTable)
                 {
                     //string table = "HousingObjectsAlternate";
                     using (SqlCommand com = new SqlCommand("", con))
@@ -127,7 +194,7 @@ namespace ScrapeService
                         foreach (var ho in hosID)
                         {
                             // hur gör jag för att knö in ett helt objekt i en insert? att stega igenom properties är drygt
-                            
+
                             // Fyll i objektspecifika parametrar till SqlCommand
                             com.Parameters.AddWithValue("@Title", ho.Title);
                             com.Parameters.AddWithValue("@Description", ho.Description);
@@ -146,6 +213,7 @@ namespace ScrapeService
 
                             // Gör anropet till databasen
                             com.ExecuteNonQuery();
+                            Variables.IncrementSaves();
                         }
                     }
                 }

@@ -13,6 +13,8 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Web;
 using System.Net;
+using System.IO.Compression;
+using System.Xml.XPath;
 
 namespace ScrapeService
 {
@@ -86,35 +88,38 @@ namespace ScrapeService
 
         public List<string> GetSiteMap(string url)
         {
-            // tänkt att hämta alla sitemaps ifrån ett sitemap index
-            
-            List<string> result = new List<string>();
-            string target = url + "sitemap";
-            WebClient client = new WebClient();
-            string str = "";
-            Stream stream = client.OpenRead(target);
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                str = reader.ReadToEnd();
-            }
-            stream.Close();
-            XmlDocument xml = new XmlDocument();
-            //xml.Load(str.ToUpper());
+            List<string> result = url.GetNodeList();
+            result.RemoveRange(0, 2);
+            //List<string> result = new List<string>();
+            //string target = url + "sitemap";
+            //WebClient client = new WebClient();
+            //string root = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName;
+            //string file = string.Concat(root + @"\Data\data.txt");
 
+            //// Decompress sitemap and write to file     ---> TODO: keep in memorystream instead of file
+            //using (Stream stream = client.OpenRead(target))
+            //using (Stream tmpFile = File.Create(file))
+            //using (Stream compStream = new GZipStream(stream, CompressionMode.Decompress))
+            //{
+            //    byte[] buffer = new byte[4096];
+            //    int nRead;
+            //    while ((nRead = compStream.Read(buffer, 0, buffer.Length)) > 0)
+            //    {
+            //        tmpFile.Write(buffer, 0, nRead);
+            //    }
+            //}
+            //string [] ps = Directory.GetFiles(root + @"\Data");
+            //string filepath = ps.ElementAt(0);
 
-            //WebClient Client = new WebClient();
-            //Path path = Environment.SpecialFolder.Desktop;
-            //string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + @"Data\");
-            //Client.DownloadFile(url + "/sitemap.xml", Environment.SpecialFolder.Desktop + "Data.txt");
+            //XmlDocument doc = new XmlDocument();
+            //doc.Load(filepath);
+            //XmlElement docRoot = doc.DocumentElement;
 
-
-            ScrapingBrowser Browser = new ScrapingBrowser();
-            Browser.AllowAutoRedirect = true;
-            Browser.AllowMetaRedirect = true;
-            Browser.TransferEncoding = "UTF-8";
-            string s = Browser.DownloadString(new Uri(target));
-            //string s = "";
-
+            //XmlNodeList nodes = docRoot.GetElementsByTagName("loc"); 
+            //foreach (XmlNode node in nodes)
+            //{
+            //    result.Add(node.InnerText);
+            //}
 
             return result;
         }
