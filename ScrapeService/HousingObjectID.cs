@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace ScrapeService
 {
-    public class HousingObject
+    public class HousingObjectID
     {
-        public string HousingId { get; set; }
+        public int HousingId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public string Category { get; set; }
@@ -25,14 +25,6 @@ namespace ScrapeService
         public string Address { get; set; }
         public string SourceUrl { get; set; }
         public string SourceName { get; set; }
-        //Convert housing object to JSON 
-        public string ToJson()
-        {
-            string sb = JsonConvert.SerializeObject(this);
-            return sb;
-        }
-        
-
 
     }
 }

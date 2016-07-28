@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace ScrapeService
 {
@@ -34,6 +38,10 @@ namespace ScrapeService
             if (str.Contains("Idag"))
             {
                 return DateTime.Now.Date;
+            }
+            else if (str.Contains("Igår"))
+            {
+                return DateTime.Now.AddDays(-1);
             }
             else
             {
@@ -74,6 +82,69 @@ namespace ScrapeService
                 return str.Substring(0, i);
             else
                 return str;
+        }
+
+        public static List<string> GetNodeList(this string str)
+        {
+            List<string> result = new List<string>();
+
+            WebClient client = new WebClient();
+            string root = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName;
+            string file = string.Concat(root + @"\Data\data.txt");
+
+            // Decompress sitemap and write to file     ---> TODO: keep in memorystream instead of file
+            using (Stream stream = client.OpenRead(str))
+            using (Stream tmpFile = File.Create(file))
+            using (Stream compStream = new GZipStream(stream, CompressionMode.Decompress))
+            {
+                byte[] buffer = new byte[4096];
+                int nRead;
+                while ((nRead = compStream.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    tmpFile.Write(buffer, 0, nRead);
+                }
+            }
+            string[] ps = Directory.GetFiles(root + @"\Data");
+            string filepath = ps.ElementAt(0);
+
+            XmlDocument doc = new XmlDocument();
+            doc.Load(filepath);
+            XmlElement docRoot = doc.DocumentElement;
+
+            XmlNodeList nodes = docRoot.GetElementsByTagName("loc");
+            foreach (XmlNode node in nodes)
+            {
+                result.Add(node.InnerText);
+            }
+
+            return result;
+        }
+
+
+
+
+        // HousingObject METHODS
+        public static HousingObjectID ConvertToInt(this HousingObject ho)
+        {
+            HousingObjectID hoID = new HousingObjectID
+            {
+                HousingId = Convert.ToInt32(ho.HousingId),
+                Address = ho.Address,
+                Area = ho.Area,
+                Category = ho.Category,
+                City = ho.City,
+                County = ho.County,
+                Description = ho.Description,
+                Fee = ho.Fee,
+                Municipality = ho.Municipality,
+                Rooms = ho.Rooms,
+                Size = ho.Size,
+                SourceName = ho.SourceName,
+                SourceUrl = ho.SourceUrl,
+                Title = ho.Title,
+                Updated = ho.Updated
+            };
+            return hoID;
         }
     }
 }

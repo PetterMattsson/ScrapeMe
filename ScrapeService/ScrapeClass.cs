@@ -1,12 +1,15 @@
-﻿using System;
+﻿using ScrapySharp.Network;
+using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml;
 using System.Xml.Linq;
@@ -18,106 +21,210 @@ namespace ScrapeService
     {
         public DataSet Data { get; set; }
         public List<string> urls = new List<string>();
-        int NumberOfScrapes;
-        int ObjectId = 1;
+        //int NumberOfScrapes;
+        //int ObjectId = 1;
         List<HousingObject> ObjectsToSave = new List<HousingObject>();
+        string table = "";
+        string conString = "Server = tcp:scraperesultserver.database.windows.net,1433; Initial Catalog = ScrapeResults; Persist Security Info = False; User ID = scraperesultlogin; Password =B1g02016; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30;";
 
-        public ScrapeClass(string url)
+        public ScrapeClass()
         {
-            //urls = Loop(url);
-            //XmlTextReader reader = new XmlTextReader(url);
-            NumberOfScrapes = urls.Count();
-            //Data = reader.ReadOuterXml();                     // turn xml-document to readable data from passed url
+            table = GetTable();
+
+            
+
         }
 
-        // Overload for more ScrapingPatterns
-        public void Scrape(SPKvalster pattern)
+        public string GetTable()
         {
-            HousingObject ho = pattern.Scrape("http://kvalster.se/Halmstad/Uthyres/L%C3%A4genheter/Snostorpsvagen_66_1775554");
-            ho.HousingId = "5".ToString();
-            ObjectsToSave.Add(ho);
-            //foreach (string url in urls)
-            //{
-            //    HousingObject ho = pattern.Scrape(url);           // catch object returned by scrapingpattern
+            string str = "";
+            if (table == "")
+            {
+                table = "HousingObjects";
+            }
+            else
+            {
+                using (SqlConnection con = new SqlConnection(conString))
+                {
+                    con.Open();
+                    using (SqlCommand com = new SqlCommand("Select TableName from TableToUse", con))
+                    {
+                        // hämta vilken tabell vi ska använda
+                        str = com.ExecuteScalar().ToString();
+                    }
+                    con.Close();
+                }
+            }
+            return str;
+        }
 
-            //    if (ho.SourceUrl != "" || ho.SourceUrl != null)     // only save if the sourceUrl is present
-            //    {
-            //        ho.Id = ObjectId;
-            //        SaveData(ho);
-            //    }
-                ObjectId += 1;
-            //}
+        public void SetTable(string str)
+        {
+            string tn = table == "HousingObjects" ? "HousingObjectsAlternate" : "HousingObjects";
+            using (SqlConnection con = new SqlConnection(conString))
+            {
+                con.Open();
+                using (SqlCommand com = new SqlCommand("Update TableToUse Set TableName = " + tn))
+                {
+                    com.ExecuteNonQuery();
+                }
+                con.Close();
+            }
+        }
+
+
+        // Overload for more ScrapingPatterns
+        public void Scrape(SPKvalster pattern, string url)
+        {
+            List<string> maps = pattern.GetSiteMap(url + @"\sitemap");
+            //XMLMethods.WriteToData(url + @"\sitemap");
+            //List<string> maps = XMLMethods.ReadFromData();
+            urls = Loop(maps);
+
+            foreach (string link in urls)
+            {
+                HousingObject ho = pattern.Scrape(link);           // catch object returned by scrapingpattern
+
+                if (ho.SourceUrl != "" || ho.SourceUrl != null)     // only save if the sourceUrl is present
+                {
+                    ho.HousingId = Variables.GetObjectId().ToString();
+                    Variables.IncrementObjectId();
+                }
+            }
             SaveData(ObjectsToSave);
         }
 
-        public List<string> Loop(string map)
+        public List<string> Loop(List<string> sitemaps)
         {
-            // xml-taggen som ska hämtas är <doc>värde</doc>
-            XDocument doc = XDocument.Load(map);
-            SiteMapPath smp = new SiteMapPath();
-            //smp.SiteMapProvider;
+            /*
+             *      DET ÄR DEN FÖRSTA LOOPEN HÄR SOM VI BEHÖVER TRÅDA
+             */
 
 
-            //HttpWebRequest request = (HttpWebRequest)WebRequest.Create(map);
-            //HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            //StreamReader sr = new StreamReader(response.GetResponseStream());
-            //XmlDocument doc = new XmlDocument();
-            ////doc.LoadXml(sr.ReadToEnd());
-            //string html = sr.ReadToEnd();
-            ////XElement sitemap = XElement.Load(sr.ReadToEnd());
-            //sr.Close();
-            //html = html.Replace(Convert.ToString((byte)0x1F), string.Empty);
-            //XmlReader reader = new XmlTextReader(html);
-            //doc = reader.ReadOuterXml(); ;
-
-            //// Download sitemap.
-            XElement sitemap = XElement.Load("http://www.gstatic.com/culturalinstitute/sitemaps/www_google_com_culturalinstitute/sitemap-index.xml");
-
-            //// ... XNames.
-            XName url = XName.Get("url", "http://www.sitemaps.org/schemas/sitemap/0.9");
-            XName loc = XName.Get("loc", "http://www.sitemaps.org/schemas/sitemap/0.9");
-
-            foreach (var urlElement in sitemap.Elements(url))
+            // xml-taggen som ska hämtas är <loc>värde</loc>
+            //fyller listan urls med alla URL:s ifrån ett sitemapindex som vi får ifrån ScrapingPattern
+            List<List<string>> sites = new List<List<string>>();
+            int i = 0;
+            foreach (string map in sitemaps)
             {
-                var locElement = urlElement.Element(loc);
-                Console.WriteLine(locElement.Value);
+                XMLMethods.WriteToData(map);
+                List<string> tmp = XMLMethods.ReadFromData();
+                List<string> tmp2 = new List<string>();
+                foreach (string site in tmp)
+                {
+                    urls.Add(site);
+                }
+                Console.WriteLine(urls.Count());
+                //sites.Add(tmp2);
+            //}
+            //foreach (List<string> list in sites)
+            //{
+            //    foreach (string str in list)
+            //    {
+            //        urls.Add(str);
+            //    }
             }
 
-
-            //private IEnumerable<string> GetUrls(string url)
-            //        {
-            //List<string> urls = new List<string>();
-            //XElement x = XElement.Load(new StringReader(map));
-            //XmlReader xmlReader = new XmlTextReader("http://www.gstatic.com/culturalinstitute/sitemaps/www_google_com_culturalinstitute/sitemap-index.xml");
-            //xmlReader.Read();
-            //XPathDocument document = new XPathDocument(xmlReader);
-            //XPathNavigator navigator = document.CreateNavigator();
-
-            //XmlNamespaceManager resolver = new XmlNamespaceManager(xmlReader.NameTable);
-            //resolver.AddNamespace("sitemap", "http://www.google.com/schemas/sitemap/0.9");
-
-            //XPathNodeIterator iterator = navigator.Select("/sitemap:urlset/sitemap:url/sitemap:loc", resolver);
-
-            //while (iterator.MoveNext())
-            //{
-            //    if (iterator.Current == null)
-            //        continue;
-
-            //    urls.Add(iterator.Current.Value);
-            //}
-
+            Variables.AddScrapes(urls.Count());
             return urls;
         }
-        //}
+
 
         public void SaveData(List<HousingObject> hos)
         {
-            //ObjectsToSave = new List<HousingObject>();
-            // save ho to db
-            // skicka iväg lista av HousingObjects
+            bool newTable = false;
+            List<HousingObjectID> hosID = new List<HousingObjectID>();
+            table = newTable ? "HousingObjectsAlternate" : "HousingObjects";
+
+            // Konvertera till objekttyp som matchar databasen
+            foreach (var ho in hos)
+            {
+                HousingObjectID hoID = ho.ConvertToInt();
+                hosID.Add(hoID);
+            }
+
+            string conString = "Server = tcp:scraperesultserver.database.windows.net,1433; Initial Catalog = ScrapeResults; Persist Security Info = False; User ID = scraperesultlogin; Password =B1g02016; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30;";
+            using (SqlConnection con = new SqlConnection(conString))
+            {
+                con.Open();
+                using (SqlCommand com = new SqlCommand("Delete from " + table, con))
+                {
+                    // rensa data ur tabellen vi ska använda
+                    com.ExecuteNonQuery();
+                }
+                if (!newTable)
+                {
+                    //string table = "HousingObjects";
+                    using (SqlCommand com = new SqlCommand("", con))
+                    {
+                        com.CommandText = "insert into " + table + "(Title, Description, Category, Rooms, Fee, Size, Area, City, Municipality, County, Updated, Address, SourceUrl, SourceName) values (@Title, @Description, @Category, @Rooms, @Fee, @Size, @Area, @City, @Municipality, @County, @Updated, @Address, @SourceUrl, @SourceName)";
+
+                        foreach (var ho in hosID)
+                        {
+                            // hur gör jag för att knö in ett helt objekt i en insert? att stega igenom properties är drygt
+
+                            // Fyll i objektspecifika parametrar till SqlCommand
+                            com.Parameters.AddWithValue("@Title", ho.Title);
+                            com.Parameters.AddWithValue("@Description", ho.Description);
+                            com.Parameters.AddWithValue("@Category", ho.Category);
+                            com.Parameters.AddWithValue("@Rooms", ho.Rooms);
+                            com.Parameters.AddWithValue("@Fee", ho.Fee);
+                            com.Parameters.AddWithValue("@Size", ho.Size);
+                            com.Parameters.AddWithValue("@Area", ho.Area);
+                            com.Parameters.AddWithValue("@City", ho.City);
+                            com.Parameters.AddWithValue("@Municipality", ho.Municipality);
+                            com.Parameters.AddWithValue("@County", ho.County);
+                            com.Parameters.AddWithValue("@Updated", ho.Updated);
+                            com.Parameters.AddWithValue("@Address", ho.Address);
+                            com.Parameters.AddWithValue("@SourceUrl", ho.SourceUrl);
+                            com.Parameters.AddWithValue("@SourceName", ho.SourceName);
+
+                            // Gör anropet till databasen
+                            com.ExecuteNonQuery();
+                            Variables.IncrementSaves();
+                        }
+                    }
+                }
+                if (newTable)
+                {
+                    //string table = "HousingObjectsAlternate";
+                    using (SqlCommand com = new SqlCommand("", con))
+                    {
+                        com.CommandText = "insert into " + table + "(Title, Description, Category, Rooms, Fee, Size, Area, City, Municipality, County, Updated, Address, SourceUrl, SourceName) values (@Title, @Description, @Category, @Rooms, @Fee, @Size, @Area, @City, @Municipality, @County, @Updated, @Address, @SourceUrl, @SourceName)";
+                        foreach (var ho in hosID)
+                        {
+                            // hur gör jag för att knö in ett helt objekt i en insert? att stega igenom properties är drygt
+
+                            // Fyll i objektspecifika parametrar till SqlCommand
+                            com.Parameters.AddWithValue("@Title", ho.Title);
+                            com.Parameters.AddWithValue("@Description", ho.Description);
+                            com.Parameters.AddWithValue("@Category", ho.Category);
+                            com.Parameters.AddWithValue("@Rooms", ho.Rooms);
+                            com.Parameters.AddWithValue("@Fee", ho.Fee);
+                            com.Parameters.AddWithValue("@Size", ho.Size);
+                            com.Parameters.AddWithValue("@Area", ho.Area);
+                            com.Parameters.AddWithValue("@City", ho.City);
+                            com.Parameters.AddWithValue("@Municipality", ho.Municipality);
+                            com.Parameters.AddWithValue("@County", ho.County);
+                            com.Parameters.AddWithValue("@Updated", ho.Updated);
+                            com.Parameters.AddWithValue("@Address", ho.Address);
+                            com.Parameters.AddWithValue("@SourceUrl", ho.SourceUrl);
+                            com.Parameters.AddWithValue("@SourceName", ho.SourceName);
+
+                            // Gör anropet till databasen
+                            com.ExecuteNonQuery();
+                            Variables.IncrementSaves();
+                        }
+                    }
+                }
+                newTable = !newTable;
+                con.Close();
+            }
+
+            // Överföring till databas är klar. Push till search med nyhämtad data är som vanligt nedan
             SeachService sp = new SeachService();
-            sp.DeleteIndex();
-            sp.BuildIndex();
+            //sp.DeleteIndex();
+            //sp.BuildIndex();
             sp.ListUpload(hos);
         }
     }
