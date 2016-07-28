@@ -77,9 +77,12 @@ namespace ScrapeService
                     new Field("SourceUrl", DataType.String)                     { IsSearchable = false, IsFilterable = true },
                     new Field("SourceName", DataType.String)                    { IsSearchable = false, IsFilterable = true }
                 }
-            };
+                
+                
+};
 
             serviceClient.Indexes.Create(definition);
+
         }
     }
 }
