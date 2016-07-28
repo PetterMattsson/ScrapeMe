@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>ScrapeMe Search Demo</title>
+    <title>ScrapeMe Sök Demo</title>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -23,6 +23,14 @@
     <![endif]-->
     
     <link href="css/custom.css" rel="stylesheet" />
+    <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
+    <script type="text/javascript">
+    window.cookieconsent_options = {"message":"This website uses cookies to ensure you get the best experience on our website","dismiss":"Got it!","learnMore":"More info","link":"http://scrapesite.azurewebsites.net/disclaimer.html","theme":"dark-bottom"};
+    </script>
+
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.10/cookieconsent.min.js"></script>
+    <!-- End Cookie Consent plugin -->
+    <script src="js/search.js"></script>
     
 </head>
 <body>
@@ -37,13 +45,13 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
-                        <a class="navbar-brand" href="#">Scrape site</a>
+                        <a class="navbar-brand" href="#">Sök bostad</a>
                     </div>
                     <div class="collapse navbar-collapse" id="myNavbar">
                         <ul class="nav navbar-nav">
-                            <li class="active"><a href="#">Home</a></li>
-                            <li><a href="#">About Us</a></li>
-                            <li><a href="#">Advertise</a></li>
+                            <li class="active"><a href="#">Hem</a></li>
+                            <li><a href="#">Om oss</a></li>
+                            <li><a href="#">Annonsera</a></li>
                             <li class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">Filtrera<span class="caret"></span></a>
                                 <ul class="dropdown-menu">
@@ -67,7 +75,7 @@
                 <div ng-controller="searchCtrl">
                     <div id="custom-search-input">
                         <div class="input-group col-md-12">
-                            <input type="text" ng-model="query" class=" search-query form-control" placeholder="Search" ng-keydown="$event.which === 13 && goSearch()" />
+                            <input type="text" ng-model="query" class="search-query form-control" placeholder="Search" ng-keydown="$event.which === 13 && goSearch()" />
                             <span class="input-group-btn">
                                 <button class="btn btn-danger" type="button" ng-click="goSearch()">
                                     <span class="glyphicon glyphicon-search" ></span>
@@ -75,14 +83,18 @@
                             </span>
                         </div>
                     </div>
+                    <div class="search-result-summary">
+                        <p> Din sökning gav <strong>{{records.length}}</strong> träffar.</p>
+                    </div>
                     <ul class="list-group">
                         <li class="list-group-item" ng-repeat="x in records">
                             <div class="housing-frame">
-                                <a href="http://www.google.se">
+                                <a href="{{x.SourceUrl}}">
                                     <h3 class="housing-title">{{x.Title}}</h3>
-                                    <span class="housing-location">{{x.County}}> {{x.Municipality}}> {{x.City}}> {{x.Area}}</span>
                                     <span class="housing-category"><strong>{{x.Category}}</strong></span>
+                                    <span class="housing-location">{{x.County}}> {{x.Municipality}}> {{x.City}}> {{x.Area}}</span>
                                     <p class="housing-description">{{x.Description}}</p>
+                                    <p>Förmedlas av: {{x.SourceName}}</p>
                                     <div class="housing-details">
                                         <span class="housing-rooms"><span class="glyphicon glyphicon-home"></span> {{x.Rooms}} rum</span>
                                         <span class="housing-fee"><span class="glyphicon glyphicon-piggy-bank"></span> {{x.Fee}} kr/mån</span>
@@ -92,61 +104,14 @@
                             </div>
                         </li>
                     </ul>
-                    <!--
-                    <table class="table table-condensed">
-                        <thead>
-                            <tr>
-                                <th>Titel</th>
-                                <th>Beskrivning</th>
-                                <th>Avgift (kr/mån)</th>
-                                <th>Yta (kvm)</th>
-                            </tr>
-                        </thead>
-                        <tr ng-repeat="x in records">
-                            <td>{{x.Title}}</td>
-                            <td>{{x.Description}}</td>
-                            <td>{{x.Fee}}</td>
-                            <td>{{x.Size}}</td>
-                        </tr>
-                    </table>
-                    -->
-                    <p>Search terms for demo</p>
-                    <ul>
-                        <li>Malmö</li>
-                        <li>Möllan</li>
-                        <li>Nybro</li>
-                        <li>Läg*</li>
-                    </ul>
-    
+                    
                 </div>
             </div>
+            <footer>
+                <p>Den här siten är en konstruktion av ScrapeKnights Inc - 2016</p>
+            </footer>
         </div>
     </div>
-        <!-- Custom scipts -->
-        <script>
-
-            var app = angular.module('searchApp', []);
-
-            app.controller('searchCtrl', function ($scope, $http) {
-                $scope.goSearch = function () {
-                    var myUrl = "https://scrapeme.search.windows.net/indexes/housing/docs?search="+$scope.query+"*&api-version=2015-02-28";
-                    var req = {
-                        method: 'GET',
-                        url: myUrl,
-                        headers: {
-                            'Content-Type': 'application/JSON',
-                            'api-key': '702D2B776E3D459E128ACCCAECD01BD9'
-                        }
-                    };
-
-                    $http(req)
-                       .then(function (response) {
-                           $scope.records = response.data.value;
-                       });
-                };
-            });
-
-           
-        </script>
+        
 </body>
 </html>
