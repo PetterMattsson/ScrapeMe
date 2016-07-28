@@ -74,12 +74,12 @@ namespace ScrapeService
 
 
         // Overload for more ScrapingPatterns
-        public void Scrape(SPKvalster pattern, string url)
+        public async void Scrape(SPKvalster pattern, string url)
         {
             List<string> maps = pattern.GetSiteMap(url + @"\sitemap");
             //XMLMethods.WriteToData(url + @"\sitemap");
             //List<string> maps = XMLMethods.ReadFromData();
-            urls = Loop(maps);
+            urls = await Loop(maps);
 
             foreach (string link in urls)
             {
@@ -94,27 +94,33 @@ namespace ScrapeService
             SaveData(ObjectsToSave);
         }
 
-        public List<string> Loop(List<string> sitemaps)
+        public async Task< List<string>> Loop(List<string> sitemaps)
         {
             /*
              *      DET ÄR DEN FÖRSTA LOOPEN HÄR SOM VI BEHÖVER TRÅDA
              */
 
-
+            DateTime start = DateTime.Now;
             // xml-taggen som ska hämtas är <loc>värde</loc>
             //fyller listan urls med alla URL:s ifrån ett sitemapindex som vi får ifrån ScrapingPattern
             List<List<string>> sites = new List<List<string>>();
             int i = 0;
             foreach (string map in sitemaps)
             {
-                XMLMethods.WriteToData(map);
-                List<string> tmp = XMLMethods.ReadFromData();
-                List<string> tmp2 = new List<string>();
-                foreach (string site in tmp)
+                bool success = await XMLMethods.WriteToData(map);
+                //System.Threading.Thread.Sleep(3000);
+                if (success)
                 {
-                    urls.Add(site);
+                    List<string> tmp = XMLMethods.ReadFromData();
+                    List<string> tmp2 = new List<string>();
+                    i = tmp.Count();
+                    foreach (string site in tmp)
+                    {
+                        urls.Add(site);
+                    }
+                    Console.WriteLine(map + ": " + i);
+                    Console.WriteLine("Totalt: " + urls.Count());
                 }
-                Console.WriteLine(urls.Count());
                 //sites.Add(tmp2);
             //}
             //foreach (List<string> list in sites)
@@ -124,7 +130,9 @@ namespace ScrapeService
             //        urls.Add(str);
             //    }
             }
-
+            DateTime end = DateTime.Now;
+            TimeSpan tid = end - start;
+            Console.WriteLine("urls byggdes på " + tid + ", med " + urls.Count() + " stycken länkar.");
             Variables.AddScrapes(urls.Count());
             return urls;
         }
