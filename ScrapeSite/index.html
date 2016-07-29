@@ -4,39 +4,12 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>ScrapeMe Sök Demo</title>
-
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <!-- Angular-->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
-
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-    
     <link href="css/custom.css" rel="stylesheet" />
-    <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
-    <script type="text/javascript">
-    window.cookieconsent_options = {"message":"This website uses cookies to ensure you get the best experience on our website","dismiss":"Got it!","learnMore":"More info","link":"http://scrapesite.azurewebsites.net/disclaimer.html","theme":"dark-bottom"};
-    </script>
-
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.10/cookieconsent.min.js"></script>
-    <!-- End Cookie Consent plugin -->
-    <script src="js/search.js"></script>
-    
 </head>
 <body>
-    <div class="container">
+    <div class="container-fluid">
         <div class="starter-template">
-
             <nav class="navbar navbar-inverse">
                 <div class="container-fluid">
                     <div class="navbar-header">
@@ -52,66 +25,91 @@
                             <li class="active"><a href="#">Hem</a></li>
                             <li><a href="#">Om oss</a></li>
                             <li><a href="#">Annonsera</a></li>
-                            <li class="dropdown">
-                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Filtrera<span class="caret"></span></a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#">Filter 1</a></li>
-                                    <li><a href="#">Filter 2</a></li>
-                                    <li><a href="#">Filter 3</a></li>
-                                </ul>
-                            </li>
                         </ul>
-                        
-                        <!-- To be implemented later
-                        <ul class="nav navbar-nav navbar-right">
-                            <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-                        </ul>
-                            -->
                     </div>
                 </div>
             </nav>
-            <div ng-app="searchApp">
-                <div ng-controller="searchCtrl">
-                    <div id="custom-search-input">
-                        <div class="input-group col-md-12">
-                            <input type="text" ng-model="query" class="search-query form-control" placeholder="Search" ng-keydown="$event.which === 13 && goSearch()" />
-                            <span class="input-group-btn">
-                                <button class="btn btn-danger" type="button" ng-click="goSearch()">
-                                    <span class="glyphicon glyphicon-search" ></span>
-                                </button>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="search-result-summary">
-                        <p> Din sökning gav <strong>{{records.length}}</strong> träffar.</p>
-                    </div>
-                    <ul class="list-group">
-                        <li class="list-group-item" ng-repeat="x in records">
-                            <div class="housing-frame">
-                                <a href="{{x.SourceUrl}}">
-                                    <h3 class="housing-title">{{x.Title}}</h3>
-                                    <span class="housing-category"><strong>{{x.Category}}</strong></span>
-                                    <span class="housing-location">{{x.County}}> {{x.Municipality}}> {{x.City}}> {{x.Area}}</span>
-                                    <p class="housing-description">{{x.Description}}</p>
-                                    <p>Förmedlas av: {{x.SourceName}}</p>
-                                    <div class="housing-details">
-                                        <span class="housing-rooms"><span class="glyphicon glyphicon-home"></span> {{x.Rooms}} rum</span>
-                                        <span class="housing-fee"><span class="glyphicon glyphicon-piggy-bank"></span> {{x.Fee}} kr/mån</span>
-                                        <span class="housing-size"><span class="glyphicon glyphicon-fullscreen"></span> {{x.Size}} kvm</span>
-                                    </div>
-                                </a>
+            
+                <div ng-app="searchApp">
+                    <div ng-controller="searchCtrl">
+                        <!--Filter-->
+                        <form role="form">
+                            <div class="form-group">
+                                <label for="includeTrade">Inkludera byten:</label>
+                                <input class="" type="checkbox" name="includeTrade"  />
                             </div>
-                        </li>
-                    </ul>
-                    
+                            <div class="form-group-lg">
+                                    <label for="maxFee">
+                                        Max hyra:{{fee}}
+                                        <input class="form-control" type="range" min="0" max="20000" step="100" ng-model="fee" />
+                                    </label>
+                                    <label for="minRooms">
+                                        Minst antal rum:{{rooms}}
+                                        <input class="form-control" type="range" min="0" max="10" step="1" ng-model="rooms" />
+                                    </label>
+                                    <label>
+                                        Minst antal KVM:{{size}}
+                                        <input class="form-control" type="range" min="0" max="200" step="10" ng-model="size" />
+                                    </label>
+                            </div>
+                        </form>
+                        <!--Filter slut-->
+                        <div id="custom-search-input">
+                            <div class="input-group col-md-12">
+                                <input type="text" ng-model="query" class="search-query form-control" placeholder="Sök" ng-keydown="$event.which === 13 && goSearch()" />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-danger" type="button" ng-click="goSearch()">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="search-result-summary">
+                            <p> Din sökning gav <strong>{{records.length}}</strong> träffar.</p>
+                        </div>
+                        <ul class="list-group">
+                            <li class="list-group-item" ng-repeat="x in records">
+                                <div class="housing-frame">
+                                    <a href="{{x.SourceUrl}}">
+                                        <h3 class="housing-title">{{x.Title}}</h3>
+                                        <span class="housing-category"><strong>{{x.Category}}</strong></span>
+                                        <span class="housing-location">{{x.County}}> {{x.Municipality}}> {{x.City}}> {{x.Area}}</span>
+                                        <p class="housing-description">{{x.Description}}</p>
+                                        <p>Förmedlas av: {{x.SourceName}}</p>
+                                        <div class="housing-details">
+                                            <span class="housing-rooms"><span class="glyphicon glyphicon-home"></span> {{x.Rooms}} rum</span>
+                                            <span class="housing-fee"><span class="glyphicon glyphicon-piggy-bank"></span> {{x.Fee}} kr/mån</span>
+                                            <span class="housing-size"><span class="glyphicon glyphicon-fullscreen"></span> {{x.Size}} kvm</span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-            <footer>
-                <p>Den här siten är en konstruktion av ScrapeKnights Inc - 2016</p>
-            </footer>
-        </div>
+                <footer>
+                    <p>Den här siten är en konstruktion av ScrapeKnights Inc - 2016</p>
+                </footer>
+</div>
     </div>
-        
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <!-- Angular-->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
+    <script type="text/javascript">
+    window.cookieconsent_options = {"message":"Den här sajten använder Cookies för att förbättra upplevelsen.","dismiss":"Jag förstår!","learnMore":"Mer info","link":"http://scrapesite.azurewebsites.net/disclaimer.html","theme":"dark-bottom"};
+    </script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.10/cookieconsent.min.js"></script>        
+    <script src="js/search.js"></script>
 </body>
 </html>
