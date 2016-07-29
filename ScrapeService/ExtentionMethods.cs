@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -84,46 +85,74 @@ namespace ScrapeService
                 return str;
         }
 
-        public static List<string> GetNodeList(this string str)
+        public static async Task<List<string>> GetNodeList(this string str)
         {
             List<string> result = new List<string>();
 
-            WebClient client = new WebClient();
-            string root = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName;
-            string file = string.Concat(root + @"\Data\data.txt");
+            bool success = await XMLMethods.WriteToData(str);
 
-            // Decompress sitemap and write to file     ---> TODO: keep in memorystream instead of file
-            using (Stream stream = client.OpenRead(str))
-            using (Stream tmpFile = File.Create(file))
-            using (Stream compStream = new GZipStream(stream, CompressionMode.Decompress))
+            if (success)
             {
-                byte[] buffer = new byte[4096];
-                int nRead;
-                while ((nRead = compStream.Read(buffer, 0, buffer.Length)) > 0)
-                {
-                    tmpFile.Write(buffer, 0, nRead);
-                }
-            }
-            string[] ps = Directory.GetFiles(root + @"\Data");
-            string filepath = ps.ElementAt(0);
-
-            XmlDocument doc = new XmlDocument();
-            doc.Load(filepath);
-            XmlElement docRoot = doc.DocumentElement;
-
-            XmlNodeList nodes = docRoot.GetElementsByTagName("loc");
-            foreach (XmlNode node in nodes)
-            {
-                result.Add(node.InnerText);
+                result = await XMLMethods.ReadFromData();
             }
 
             return result;
         }
 
+        public static int IsNumber(this string str)
+        {
+            int i = 0;
+            try
+            {
+                i = Convert.ToInt32(str);
+
+            }
+            catch
+            {
+                // do nothing
+            }
+
+            return i;
+
+        }
+
+        public static double IsDouble(this string str)
+        {
+            double d = 0;
+
+            try
+            {
+                d = Convert.ToDouble(str);
+            }
+            catch
+            {
+
+            }
+            return d;
+        }
 
 
 
-        // HousingObject METHODS
+
+        // LIST<STRING> METHODS
+        public static List<string> CleanUrls(this List<string> list)
+        {
+            List<string> result = new List<string>();
+            foreach (string s in list)
+            {
+                int count = Regex.Matches(s, @"/").Count;
+                if (count < 4 || s.Contains("sitemap"))
+                {
+                    // do nothing
+                }
+                else
+                    result.Add(s);
+            }
+            return result;
+        }
+
+
+        // HOUSINGOBJECTS METHODS
         public static HousingObjectID ConvertToInt(this HousingObject ho)
         {
             HousingObjectID hoID = new HousingObjectID
@@ -145,6 +174,25 @@ namespace ScrapeService
                 Updated = ho.Updated
             };
             return hoID;
+        }
+
+        public static string GetID(this HousingObject ho, string conString, string table)
+        {
+            string result = "";
+
+            using (SqlConnection con = new SqlConnection(conString))
+            {
+                con.Open();
+                using (SqlCommand com = new SqlCommand("Select HousingID from " + table +
+                    " where SourceUrl = '" + ho.SourceUrl + "' and Rooms = " + ho.Rooms + " and Fee = " + ho.Fee + "", con))
+                {
+                    // hämta ID från db
+                    result = com.ExecuteScalar().ToString();
+                }
+                con.Close();
+            }
+
+            return result;
         }
     }
 }

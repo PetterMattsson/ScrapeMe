@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Xml;
 
 namespace ScrapeService
@@ -18,34 +19,58 @@ namespace ScrapeService
             string root = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName;
             string file = string.Concat(root + @"\Data\data.txt");
 
-            // Decompress sitemap and write to file     ---> TODO: keep in memorystream instead of file
-            try
+            HttpWebRequest httpReq = (HttpWebRequest)WebRequest.Create(str);
+            httpReq.AllowAutoRedirect = false;
+
+            HttpWebResponse httpRes = (HttpWebResponse)httpReq.GetResponse();
+
+            if (httpRes.StatusCode == HttpStatusCode.OK)
             {
-                using (Stream stream = client.OpenRead(str))
-                using (Stream tmpFile = File.Create(file))
-                using (Stream compStream = new GZipStream(stream, CompressionMode.Decompress))
+                // Decompress sitemap and write to file     ---> TODO: keep in memorystream instead of file
+                try
                 {
-                    byte[] buffer = new byte[1024];
-                    int nRead;
-                    if (buffer.Length < 1 || buffer == null)
+                    using (Stream stream = client.OpenRead(str))
+                    using (Stream tmpFile = File.Create(file))
+                    using (Stream compStream = new GZipStream(stream, CompressionMode.Decompress))
                     {
-                        return false;
+
+                        byte[] buffer = new byte[1024];
+                        int nRead;
+                        if (buffer.Length < 1 || buffer == null)
+                        {
+                            httpRes.Close();
+                            return false;
+                        }
+                        while ((nRead = compStream.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            tmpFile.Write(buffer, 0, nRead);
+                        }
+                        stream.Close();
+                        stream.Dispose();
+                        tmpFile.Close();
+                        tmpFile.Dispose();
+                        compStream.Close();
+                        compStream.Dispose();
                     }
-                    while ((nRead = compStream.Read(buffer, 0, buffer.Length)) > 0)
-                    {
-                        tmpFile.Write(buffer, 0, nRead);
-                    }
+                    httpRes.Close();
+                    return true;
                 }
-                return true;
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    httpRes.Close();
+                    return false;
+                }
             }
-            catch (Exception e)
+            else
             {
-                Console.WriteLine(e.Message);
+                httpRes.Close();
                 return false;
             }
+
         }
 
-        public static List<string> ReadFromData()
+        public static async Task<List<string>> ReadFromData()
         {
             List<string> result = new List<string>();
 
@@ -55,18 +80,33 @@ namespace ScrapeService
             string filepath = ps.ElementAt(0);
 
             XmlDocument doc = new XmlDocument();
-            doc.Load(filepath);
-            XmlElement docRoot = doc.DocumentElement;
-
-            XmlNodeList nodes = docRoot.GetElementsByTagName("loc");
-            foreach (XmlNode node in nodes)
+            try
             {
-                result.Add(node.InnerText);
+                //doc.Load(filepath);
+                using (Stream s = File.OpenRead(filepath))
+                {
+                    doc.Load(s);
+                    s.Close();
+                    s.Dispose();
+                }
+
+                XmlElement docRoot = doc.DocumentElement;
+
+                XmlNodeList nodes = docRoot.GetElementsByTagName("loc");
+                foreach (XmlNode node in nodes)
+                {
+                    result.Add(node.InnerText);
+                }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
             return result;
         }
 
 
 
-}
+    }
 }
