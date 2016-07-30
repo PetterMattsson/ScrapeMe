@@ -95,18 +95,36 @@ namespace ScrapeService
                 XmlNodeList nodes = docRoot.GetElementsByTagName("loc");
                 foreach (XmlNode node in nodes)
                 {
-                    result.Add(node.InnerText);
+                    DateTime dt = node.NextSibling.InnerText.GetDateTime();
+                    if (dt > DateTime.Now.AddMonths(-12))
+                        result.Add(node.InnerText);
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
-
+            result.RemoveRange(0, 1);
             return result;
         }
 
+        public static async Task<bool> PingWebPage(string url)
+        {
+            bool result = await Task.Run(() =>
+            {
+                HttpWebRequest httpReq = (HttpWebRequest)WebRequest.Create(url);
+                httpReq.AllowAutoRedirect = false;
 
+                HttpWebResponse httpRes = (HttpWebResponse)httpReq.GetResponse();
 
+                if (httpRes.StatusCode == HttpStatusCode.OK)
+                {
+                    return true;
+                }
+                else
+                    return false;
+            });
+            return result;
+        }
     }
 }

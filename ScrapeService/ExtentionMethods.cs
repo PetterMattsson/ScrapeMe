@@ -85,20 +85,6 @@ namespace ScrapeService
                 return str;
         }
 
-        public static async Task<List<string>> GetNodeList(this string str)
-        {
-            List<string> result = new List<string>();
-
-            bool success = await XMLMethods.WriteToData(str);
-
-            if (success)
-            {
-                result = await XMLMethods.ReadFromData();
-            }
-
-            return result;
-        }
-
         public static int IsNumber(this string str)
         {
             int i = 0;
@@ -113,7 +99,6 @@ namespace ScrapeService
             }
 
             return i;
-
         }
 
         public static double IsDouble(this string str)
@@ -131,11 +116,20 @@ namespace ScrapeService
             return d;
         }
 
-
+        public static string Truncate(this string str, int chars)
+        {
+            if (str.Length > 4000)
+            {
+                str = str.Substring(0, 4000);
+                return str;
+            }
+            else
+                return str;
+        }
 
 
         // LIST<STRING> METHODS
-        public static List<string> CleanUrls(this List<string> list)
+        public static async Task<List<string>> CleanUrls(this List<string> list)
         {
             List<string> result = new List<string>();
             foreach (string s in list)
@@ -146,11 +140,27 @@ namespace ScrapeService
                     // do nothing
                 }
                 else
+                {
+                    //if (await XMLMethods.PingWebPage(s))
                     result.Add(s);
+                }
             }
             return result;
         }
 
+        public static async Task<List<string>> GetNodeList(this string str)
+        {
+            List<string> result = new List<string>();
+
+            bool success = await XMLMethods.WriteToData(str);
+
+            if (success)
+            {
+                result = await XMLMethods.ReadFromData();
+            }
+
+            return result;
+        }
 
         // HOUSINGOBJECTS METHODS
         public static HousingObjectID ConvertToInt(this HousingObject ho)

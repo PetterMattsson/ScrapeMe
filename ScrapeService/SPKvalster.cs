@@ -74,7 +74,7 @@ namespace ScrapeService
                 ho.Category = category;
                 ho.City = ""; // city;
                 ho.County = county;
-                ho.Description = description;
+                ho.Description = description.Truncate(4000); // string-method som tar första 4000 chars ur strängen om den är längre än 4000 chars
                 ho.Fee = fee.IsNumber();
                 ho.Municipality = municipality;
                 ho.Rooms = rooms.IsNumber();
@@ -97,38 +97,6 @@ namespace ScrapeService
         public async Task<List<string>> GetSiteMap(string url)
         {
             List<string> result = await url.GetNodeList();
-            result.RemoveRange(0, 2);
-            //List<string> result = new List<string>();
-            //string target = url + "sitemap";
-            //WebClient client = new WebClient();
-            //string root = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName;
-            //string file = string.Concat(root + @"\Data\data.txt");
-
-            //// Decompress sitemap and write to file     ---> TODO: keep in memorystream instead of file
-            //using (Stream stream = client.OpenRead(target))
-            //using (Stream tmpFile = File.Create(file))
-            //using (Stream compStream = new GZipStream(stream, CompressionMode.Decompress))
-            //{
-            //    byte[] buffer = new byte[4096];
-            //    int nRead;
-            //    while ((nRead = compStream.Read(buffer, 0, buffer.Length)) > 0)
-            //    {
-            //        tmpFile.Write(buffer, 0, nRead);
-            //    }
-            //}
-            //string [] ps = Directory.GetFiles(root + @"\Data");
-            //string filepath = ps.ElementAt(0);
-
-            //XmlDocument doc = new XmlDocument();
-            //doc.Load(filepath);
-            //XmlElement docRoot = doc.DocumentElement;
-
-            //XmlNodeList nodes = docRoot.GetElementsByTagName("loc"); 
-            //foreach (XmlNode node in nodes)
-            //{
-            //    result.Add(node.InnerText);
-            //}
-
             return result;
         }
 

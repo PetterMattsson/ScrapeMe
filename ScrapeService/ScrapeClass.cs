@@ -21,8 +21,6 @@ namespace ScrapeService
     {
         public DataSet Data { get; set; }
         public List<string> urls = new List<string>();
-        //int NumberOfScrapes;
-        //int ObjectId = 1;
         List<HousingObject> ObjectsToSave = new List<HousingObject>();
         string table = "";
         string conString = "Server = tcp:scraperesultserver.database.windows.net,1433; Initial Catalog = ScrapeResults; Persist Security Info = False; User ID = scraperesultlogin; Password =B1g02016; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30;";
@@ -86,46 +84,30 @@ namespace ScrapeService
         // Overload for more ScrapingPatterns
         public async void Scrape(SPKvalster pattern, string url)
         {
-            List<string> maps = await pattern.GetSiteMap(url + @"\sitemap");
+            List<string> maps = await pattern.GetSiteMap(url + @"/sitemap");
             urls = await Loop(maps);
-            urls = urls.CleanUrls();
-
+            urls = await urls.CleanUrls();
+            DateTime start = DateTime.Now;
             for (int i = 0; i < urls.Count(); i++)
             {
                 string link = urls.ElementAt(i);
-                HousingObject ho = pattern.Scrape(link);           // catch object returned by scrapingpattern
+                HousingObject ho = pattern.Scrape(link);            // catch object returned by scrapingpattern
                 if (ho == null)
                     continue;
-                if (ho.SourceUrl.Length > 0)     // only save if the sourceUrl is present TODO: Ping webpage method!!!!
+                if (ho.SourceUrl.Length > 0)                        // only save if the sourceUrl is present TODO: Ping webpage method!!!!
                 {
-                    //ho.HousingId = Variables.GetObjectId().ToString();
-                    //Variables.IncrementObjectId();
-                    ObjectsToSave.Add(ho);
-                    int j = ObjectsToSave.Count();
-                    Console.WriteLine("Objekt (" + j + "): " + link + " lades till. Totala scrapes: " + i);
-                }
-                if (ObjectsToSave.Count > 8)
-                {
-                    break;
+                    //if(await XMLMethods.PingWebPage(ho.SourceUrl))
+                    //{
+                        ObjectsToSave.Add(ho);
+                        int j = ObjectsToSave.Count();
+                        Console.WriteLine("Objekt (" + j + "): " + link + " lades till. Totala scrapes: " + i);
+                    //}
                 }
             }
-
-
-
-
-            //foreach (string link in urls)
-            //{
-            //    HousingObject ho = pattern.Scrape(link);           // catch object returned by scrapingpattern
-            //    if (ho == null)
-            //        continue;
-            //    if(ho.SourceUrl.Length > 0)     // only save if the sourceUrl is present TODO: Ping webpage method!!!!
-            //    {
-            //        //ho.HousingId = Variables.GetObjectId().ToString();
-            //        //Variables.IncrementObjectId();
-            //        ObjectsToSave.Add(ho);
-            //        Console.WriteLine("Objekt: " + ho.Title + " lades till.");
-            //    }
-            //}
+            DateTime end = DateTime.Now;
+            TimeSpan time = start - end;
+            Console.WriteLine("Scrape ran successfully, finishing in " + time.Duration() + ".");
+            Console.WriteLine("Pushing " + ObjectsToSave.Count + " objects to database and search.");
 
             SaveData(ObjectsToSave);
         }
@@ -146,15 +128,14 @@ namespace ScrapeService
         public async Task<List<string>> Loop(List<string> sitemaps)
         {
             DateTime start = DateTime.Now;
-            // xml-taggen som ska hämtas är <loc>värde</loc>
+
             //fyller listan urls med alla URL:s ifrån ett sitemapindex som vi får ifrån ScrapingPattern
             List<List<string>> sites = new List<List<string>>();
             int i = 0;
-            int j = 0;
+            int j = 1;
             foreach (string map in sitemaps)
             {
                 bool success = await XMLMethods.WriteToData(map);
-                //System.Threading.Thread.Sleep(1000);
                 if (success)
                 {
                     List<string> tmp = await XMLMethods.ReadFromData();
@@ -162,6 +143,7 @@ namespace ScrapeService
                     i = tmp.Count();
                     foreach (string site in tmp)
                     {
+                        //if(await XMLMethods.PingWebPage(site))
                         urls.Add(site);
                     }
                     Console.WriteLine(map + ": " + i);
@@ -183,9 +165,7 @@ namespace ScrapeService
 
         public void SaveData(List<HousingObject> hos)
         {
-            //bool newTable = false;
             List<HousingObjectID> hosID = new List<HousingObjectID>();
-            //table = newTable ? "HousingObjectsAlternate" : "HousingObjects";
 
             // Konvertera till objekttyp som matchar databasen
             foreach (var ho in hos)
@@ -194,7 +174,6 @@ namespace ScrapeService
                 hosID.Add(hoID);
             }
 
-            string conString = "Server = tcp:scraperesultserver.database.windows.net,1433; Initial Catalog = ScrapeResults; Persist Security Info = False; User ID = scraperesultlogin; Password =B1g02016; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30;";
             using (SqlConnection con = new SqlConnection(conString))
             {
                 con.Open();
@@ -204,10 +183,6 @@ namespace ScrapeService
                     com.ExecuteNonQuery();
                     com.Dispose();
                 }
-                //if (!newTable)
-                //{
-                //string table = "HousingObjects";
-
                 foreach (var ho in hosID)
                 {
                     using (SqlCommand com = new SqlCommand("", con))
@@ -241,56 +216,27 @@ namespace ScrapeService
                     }
 
                 }
-                //}
-                //if (newTable)
-                //{
-                //string table = "HousingObjectsAlternate";
-                //foreach (var ho in hosID)
-                //{
-                //    using (SqlCommand com = new SqlCommand("", con))
-                //    {
-                //        com.CommandText = "insert into " + table + "(Title, Description, Category, Rooms, Fee, Size, Area, City, Municipality, County, Updated, Address, SourceUrl, SourceName) values (@Title, @Description, @Category, @Rooms, @Fee, @Size, @Area, @City, @Municipality, @County, @Updated, @Address, @SourceUrl, @SourceName)";
-
-                //        // hur gör jag för att knö in ett helt objekt i en insert? att stega igenom properties är drygt
-
-                //        // Fyll i objektspecifika parametrar till SqlCommand
-                //        com.Parameters.AddWithValue("@Title", ho.Title);
-                //        com.Parameters.AddWithValue("@Description", ho.Description);
-                //        com.Parameters.AddWithValue("@Category", ho.Category);
-                //        com.Parameters.AddWithValue("@Rooms", ho.Rooms);
-                //        com.Parameters.AddWithValue("@Fee", ho.Fee);
-                //        com.Parameters.AddWithValue("@Size", ho.Size);
-                //        com.Parameters.AddWithValue("@Area", ho.Area);
-                //        com.Parameters.AddWithValue("@City", ho.City);
-                //        com.Parameters.AddWithValue("@Municipality", ho.Municipality);
-                //        com.Parameters.AddWithValue("@County", ho.County);
-                //        com.Parameters.AddWithValue("@Updated", ho.Updated);
-                //        com.Parameters.AddWithValue("@Address", ho.Address);
-                //        com.Parameters.AddWithValue("@SourceUrl", ho.SourceUrl);
-                //        com.Parameters.AddWithValue("@SourceName", ho.SourceName);
-
-                //        // Gör anropet till databasen
-                //        com.ExecuteNonQuery();
-                //        Variables.IncrementSaves();
-                //    }
-                //}
-                //}
-                //newTable = !newTable;
                 con.Close();
             }
             SetTable(table);
+
             // Överföring till databas är klar. Push till search med nyhämtad data är som vanligt nedan
-
+            List<HousingObject> tmpHos = new List<HousingObject>();
             // Hämta IDn från databasen, så att de åker med till SearchPush
-            foreach (HousingObject ho in hos)
-            {
-                ho.HousingId = ho.GetID(conString, table);
-            }
-
             SeachService sp = new SeachService();
-            //sp.DeleteIndex();
-            //sp.BuildIndex();
-            sp.ListUpload(hos);
+            for (int i = 0; i < hos.Count(); i++)
+            {
+                HousingObject ho = hos.ElementAt(i);
+                ho.HousingId = ho.GetID(conString, table);
+                tmpHos.Add(ho);
+                if(tmpHos.Count > 999)
+                {
+                    sp.ListUpload(tmpHos);
+                    tmpHos.Clear();
+                }
+            }
+            sp.DeleteIndex();
+            sp.BuildIndex();
         }
     }
 }

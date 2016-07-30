@@ -25,6 +25,7 @@ namespace ScrapeService
         {
             SearchServiceClient serviceClient = new SearchServiceClient(searchServiceName, new SearchCredentials(apiKey));
             SearchIndexClient indexClient = serviceClient.Indexes.GetClient(index);
+
             try
             {
                 var batch = IndexBatch.Upload(Hoes);
