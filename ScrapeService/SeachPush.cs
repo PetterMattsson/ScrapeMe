@@ -17,8 +17,6 @@ namespace ScrapeService
         public SeachService ()
         {
             
-               
-                
         }
 
         public void ListUpload (List <HousingObject> Hoes)
@@ -77,11 +75,13 @@ namespace ScrapeService
                     new Field("SourceUrl", DataType.String)                     { IsSearchable = false, IsFilterable = true },
                     new Field("SourceName", DataType.String)                    { IsSearchable = false, IsFilterable = true }
                 }
-                
-                
-};
 
+
+            };
             serviceClient.Indexes.Create(definition);
+
+            Index housingIndex = serviceClient.Indexes.Get("Housing");
+            housingIndex.CorsOptions.AllowedOrigins.Add("http://scrapesite.azurewebsites.net");
 
         }
     }

@@ -23,7 +23,7 @@ app.controller('searchCtrl', function ($scope, $http) {
         else {
             myFilter += "and Size ge " + $scope.size;
         }
-        var myUrl = "https://scrapeme.search.windows.net/indexes/housing/docs?search=" + $scope.query +"*"+ myFilter +"&api-version=2015-02-28";
+        var myUrl = "https://scrapeme.search.windows.net/indexes/housing/docs?search=" + $scope.query + "*" + myFilter + "&$count=true&api-version=2015-02-28";
         myUrl = encodeURI(myUrl);
         var req = {
             method: 'GET',
@@ -37,8 +37,30 @@ app.controller('searchCtrl', function ($scope, $http) {
         $http(req)
            .then(function (response) {
                $scope.records = response.data.value;
+               $scope.numberOfRecords = response.data['@odata.count'];
            });
     };
+
+    var init = function () {
+        var myUrl = "https://scrapeme.search.windows.net/indexes/housing/docs?search=*&$top=15&$skip=0&$count=true&api-version=2015-02-28";
+        var req = {
+            method: 'GET',
+            url: myUrl,
+            headers: {
+                'Content-Type': 'application/JSON',
+                'api-key': '702D2B776E3D459E128ACCCAECD01BD9'
+            }
+        };
+
+        $http(req)
+           .then(function (response) {
+               $scope.records = response.data.value;
+               $scope.numberOfRecords = response.data['@odata.count'];
+           });
+
+    };
+    // and fire it after definition
+    init();
 
    
 });

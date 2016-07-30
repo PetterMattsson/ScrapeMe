@@ -288,8 +288,8 @@ namespace ScrapeService
             }
 
             SeachService sp = new SeachService();
-            //sp.DeleteIndex();
-            //sp.BuildIndex();
+            sp.DeleteIndex();
+            sp.BuildIndex();
             sp.ListUpload(hos);
         }
     }
