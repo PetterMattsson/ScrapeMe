@@ -79,15 +79,16 @@ namespace ScrapeService
                 
 
             };
-            serviceClient.Indexes.Create(definition);
+            
 
             var corsOptions = new CorsOptions() {
                 AllowedOrigins = new[] { "http://http://scrapesite.azurewebsites.net/" }
             };
-
-            Index housingIndex = serviceClient.Indexes.Get("housing");
-            housingIndex.CorsOptions = corsOptions;
-            Console.WriteLine("Push to search done.");
+            definition.CorsOptions = corsOptions;
+            serviceClient.Indexes.Create(definition);
+            //Index housingIndex = serviceClient.Indexes.Get("housing");
+            //housingIndex.CorsOptions = corsOptions;
+            Console.WriteLine("Index rebuilt at " + DateTime.Now + ".");
             }
     }
 }

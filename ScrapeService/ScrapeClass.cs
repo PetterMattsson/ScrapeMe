@@ -245,7 +245,7 @@ namespace ScrapeService
                 HousingObject ho = hos.ElementAt(i);
                 ho.HousingId = ho.GetID(conString, table);
                 tmpHos.Add(ho);
-                if(tmpHos.Count > 999)
+                if(tmpHos.Count % 1000 == 0 || i == hos.Count() -1)
                 {
                     sp.ListUpload(tmpHos);
                     tmpHos.Clear();

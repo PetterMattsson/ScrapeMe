@@ -19,7 +19,7 @@ namespace ScrapeService
             ScrapeService.Scrape(new SPKvalster(), "http://kvalster.se/");
             // skriv ut NumberOfScrapes och aktuellt ObjectId, fejkar en logfil
             WriteReport(variables);
-        Console.ReadKey();
+            Console.ReadKey();
         }
 
 
