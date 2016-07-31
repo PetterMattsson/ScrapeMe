@@ -227,6 +227,12 @@ namespace ScrapeService
             List<HousingObject> tmpHos = new List<HousingObject>();
             // Hämta IDn från databasen, så att de åker med till SearchPush
             SeachService sp = new SeachService();
+            //Rensar gammalt
+            sp.DeleteIndex();
+            //Bygger nytt och ska sätta CORS
+            sp.BuildIndex();
+
+            //Fyller på det nybyggda tomma indexet
             for (int i = 0; i < hos.Count(); i++)
             {
                 HousingObject ho = hos.ElementAt(i);
@@ -238,8 +244,7 @@ namespace ScrapeService
                     tmpHos.Clear();
                 }
             }
-            //sp.DeleteIndex();
-            //sp.BuildIndex();
+            
         }
     }
 }
