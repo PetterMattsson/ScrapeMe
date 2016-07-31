@@ -80,10 +80,11 @@ namespace ScrapeService
 
             };
             serviceClient.Indexes.Create(definition);
-
+/*
             Index housingIndex = serviceClient.Indexes.Get("housing");
-            housingIndex.CorsOptions.AllowedOrigins.Add("http://scrapesite.azurewebsites.net");
 
+            housingIndex.CorsOptions.AllowedOrigins.Add("*");
+            */
         }
     }
 }
