@@ -38,6 +38,7 @@ namespace ScrapeService
                     "Failed to index some of the documents: {0}",
                     String.Join(", ", e.IndexingResults.Where(r => !r.Succeeded).Select(r => r.Key)));
             }
+            Console.WriteLine("Documents uploaded!");
         }
         public void DeleteIndex()
         {
@@ -82,7 +83,7 @@ namespace ScrapeService
             
 
             var corsOptions = new CorsOptions() {
-                AllowedOrigins = new[] { "http://http://scrapesite.azurewebsites.net/" }
+                AllowedOrigins = new[] { "http://scrapesite.azurewebsites.net/" }
             };
             definition.CorsOptions = corsOptions;
             serviceClient.Indexes.Create(definition);
