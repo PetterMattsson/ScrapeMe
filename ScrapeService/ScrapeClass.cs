@@ -238,8 +238,8 @@ namespace ScrapeService
                     tmpHos.Clear();
                 }
             }
-            sp.DeleteIndex();
-            sp.BuildIndex();
+            //sp.DeleteIndex();
+            //sp.BuildIndex();
         }
     }
 }
