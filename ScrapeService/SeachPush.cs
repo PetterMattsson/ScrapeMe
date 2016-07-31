@@ -80,10 +80,11 @@ namespace ScrapeService
                 
 
             };
-            
+            // "http://scrapesite.azurewebsites.net/", "https://scrapesite.azurewebsites.net/", "https://scrapeme.search.windows.net/"
 
             var corsOptions = new CorsOptions() {
-                AllowedOrigins = new[] { "http://scrapesite.azurewebsites.net/" }
+                MaxAgeInSeconds = 30,
+                AllowedOrigins = new[] { "*" }
             };
             definition.CorsOptions = corsOptions;
             serviceClient.Indexes.Create(definition);

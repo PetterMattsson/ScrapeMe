@@ -105,8 +105,8 @@ namespace ScrapeService
                         Console.WriteLine("Objekt (" + j + "): " + link + " lades till. Totala scrapes: " + i);
                         //}
                     }
-                    if (ObjectsToSave.Count > 5)
-                        break;
+                    //if (ObjectsToSave.Count > 5)
+                    //    break;
                 }
                 DateTime end = DateTime.Now;
                 TimeSpan time = start - end;
