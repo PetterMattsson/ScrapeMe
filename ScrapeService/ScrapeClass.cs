@@ -103,6 +103,8 @@ namespace ScrapeService
                         Console.WriteLine("Objekt (" + j + "): " + link + " lades till. Totala scrapes: " + i);
                     //}
                 }
+                if (ObjectsToSave.Count > 5)
+                    break;
             }
             DateTime end = DateTime.Now;
             TimeSpan time = start - end;
@@ -163,7 +165,7 @@ namespace ScrapeService
             return urls;
         }
 
-        public void SaveData(List<HousingObject> hos)
+        public async void SaveData(List<HousingObject> hos)
         {
             List<HousingObjectID> hosID = new List<HousingObjectID>();
 
@@ -177,10 +179,11 @@ namespace ScrapeService
             using (SqlConnection con = new SqlConnection(conString))
             {
                 con.Open();
-                using (SqlCommand com = new SqlCommand("Delete from " + table, con))
+                using (SqlCommand com = new SqlCommand("TRUNCATE TABLE [" + table + "];", con))
                 {
                     // rensa data ur tabellen vi ska använda
-                    com.ExecuteNonQuery();
+                    com.CommandTimeout = 90000;
+                    await com.ExecuteNonQueryAsync();
                     com.Dispose();
                 }
                 foreach (var ho in hosID)

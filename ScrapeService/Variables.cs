@@ -27,7 +27,12 @@ namespace ScrapeService
 
         public static void IncrementSaves()
         {
-            variables.NumberOfSaves = variables.NumberOfSaves++;
+            variables.NumberOfSaves = variables.NumberOfSaves +1;
+        }
+
+        public int GetSaves()
+        {
+            return variables.NumberOfSaves;
         }
 
         public static void AddScrapes(int i)

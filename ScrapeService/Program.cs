@@ -19,7 +19,7 @@ namespace ScrapeService
             ScrapeService.Scrape(new SPKvalster(), "http://kvalster.se/");
             // skriv ut NumberOfScrapes och aktuellt ObjectId, fejkar en logfil
             Console.WriteLine("Number of Scrapes: " + variables.NumberOfScrapes);
-            Console.WriteLine("Number of Saves to Database: " + variables.NumberOfSaves);
+            Console.WriteLine("Number of Saves to Database: " + variables.GetSaves());
         Console.ReadKey();
         }
     }
