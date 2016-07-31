@@ -84,34 +84,41 @@ namespace ScrapeService
         // Overload for more ScrapingPatterns
         public async void Scrape(SPKvalster pattern, string url)
         {
-            List<string> maps = await pattern.GetSiteMap(url + @"/sitemap");
-            urls = await Loop(maps);
-            urls = await urls.CleanUrls();
-            DateTime start = DateTime.Now;
-            for (int i = 0; i < urls.Count(); i++)
+            try
             {
-                string link = urls.ElementAt(i);
-                HousingObject ho = pattern.Scrape(link);            // catch object returned by scrapingpattern
-                if (ho == null)
-                    continue;
-                if (ho.SourceUrl.Length > 0)                        // only save if the sourceUrl is present TODO: Ping webpage method!!!!
+                List<string> maps = await pattern.GetSiteMap(url + @"/sitemap");
+                urls = await Loop(maps);
+                urls = await urls.CleanUrls();
+                DateTime start = DateTime.Now;
+                for (int i = 0; i < urls.Count(); i++)
                 {
-                    //if(await XMLMethods.PingWebPage(ho.SourceUrl))
-                    //{
+                    string link = urls.ElementAt(i);
+                    HousingObject ho = pattern.Scrape(link);            // catch object returned by scrapingpattern
+                    if (ho == null)
+                        continue;
+                    if (ho.SourceUrl.Length > 0)                        // only save if the sourceUrl is present TODO: Ping webpage method!!!!
+                    {
+                        //if(await XMLMethods.PingWebPage(ho.SourceUrl))
+                        //{
                         ObjectsToSave.Add(ho);
                         int j = ObjectsToSave.Count();
                         Console.WriteLine("Objekt (" + j + "): " + link + " lades till. Totala scrapes: " + i);
-                    //}
+                        //}
+                    }
+                    if (ObjectsToSave.Count > 5)
+                        break;
                 }
-                if (ObjectsToSave.Count > 5)
-                    break;
-            }
-            DateTime end = DateTime.Now;
-            TimeSpan time = start - end;
-            Console.WriteLine("Scrape ran successfully, finishing in " + time.Duration() + ".");
-            Console.WriteLine("Pushing " + ObjectsToSave.Count + " objects to database and search.");
+                DateTime end = DateTime.Now;
+                TimeSpan time = start - end;
+                Console.WriteLine("Scrape ran successfully, finishing in " + time.Duration() + ".");
+                Console.WriteLine("Pushing " + ObjectsToSave.Count + " objects to database and search.");
 
-            SaveData(ObjectsToSave);
+                SaveData(ObjectsToSave);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ScrapeClass.Scrape() error: " + e.Message);
+            }
         }
 
         public void ScrapeThis(SPKvalster pattern, string url)

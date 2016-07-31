@@ -12,17 +12,29 @@ namespace ScrapeService
         public int ObjectId;
         public int NumberOfScrapes;
         public int NumberOfSaves;
+        public bool Finished;
 
         private Variables()
         {
             ObjectId = 1;
             NumberOfSaves = 0;
             NumberOfScrapes = 0;
+            Finished = false;
         }
 
         public static Variables GetVariables()
         {
             return variables;
+        }
+
+        public static void SetFinished(bool value)
+        {
+            variables.Finished = value;
+        }
+
+        public static bool GetFinished()
+        {
+            return variables.Finished;
         }
 
         public static void IncrementSaves()

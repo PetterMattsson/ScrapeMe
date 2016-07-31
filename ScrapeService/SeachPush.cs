@@ -87,7 +87,7 @@ namespace ScrapeService
 
             Index housingIndex = serviceClient.Indexes.Get("housing");
             housingIndex.CorsOptions = corsOptions;
-         
+            Console.WriteLine("Push to search done.");
             }
     }
 }
